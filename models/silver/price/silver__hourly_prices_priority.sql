@@ -1,7 +1,7 @@
 {{ config(
     materialized = 'incremental',
     unique_key = ['token_address', 'hour'],
-    incremental_strategy = 'merge',
+    incremental_strategy = 'delete+insert',
     merge_exclude_columns = ["inserted_timestamp"],
     cluster_by = ['HOUR::DATE'],
     tags = ['core']
@@ -82,6 +82,6 @@ AND p.modified_timestamp >= (
         {{ this }}
 )
 {% endif %}
-qualify(ROW_NUMBER() over (PARTITION BY hour,token_address
+qualify(ROW_NUMBER() over (PARTITION BY p.hour, COALESCE(b.token_address,p.token_address)
                     ORDER BY
                     hour DESC)) = 1
