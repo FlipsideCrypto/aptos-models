@@ -65,7 +65,9 @@ WITH base AS (
         LEFT JOIN {{ ref('price__ez_prices_hourly') }} C
         ON LOWER(
             A.currency_address
-        ) = C.token_address
+        ) = LOWER(
+            C.token_address
+        )
         AND DATE_TRUNC(
             'hour',
             block_timestamp
