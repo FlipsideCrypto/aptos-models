@@ -17,7 +17,7 @@ SELECT
     hourly_prices_priority_id AS ez_prices_hourly_id
 FROM
     {{ ref('silver__hourly_prices_priority') }}
-UNION ALL
+    {# UNION ALL
 SELECT
     HOUR,
     token_address,
@@ -33,3 +33,4 @@ SELECT
     complete_native_prices_id AS ez_prices_hourly_id
 FROM
     {{ ref('silver__complete_native_prices') }}
+    #}
