@@ -39,6 +39,9 @@ WHERE
         OR b.modified_timestamp IS NULL
     ) {% endset %}
     {% set min_bd = run_query(min_block_date_query) [0] [0] %}
+    {% if not min_bd or min_bd == 'None' %}
+        {% set min_bd = '2099-01-01' %}
+    {% endif %}
 {% endif %}
 {% endif %}
 
@@ -104,8 +107,9 @@ FROM
     base A
 WHERE
     dupe_count = 1
+    OR has_hippo = FALSE
     OR (
-        has_hippo = TRUE
+        has_hippo
         AND dupe_count > 1
         AND platform <> 'hippo'
     )
