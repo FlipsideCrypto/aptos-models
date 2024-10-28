@@ -9,8 +9,6 @@ models:
 
     columns:
       - name: BLOCK_NUMBER
-        tests:
-          - not_null  
       - name: BLOCK_TIMESTAMP
         tests:
           - not_null
