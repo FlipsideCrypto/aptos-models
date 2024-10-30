@@ -82,6 +82,7 @@ AND p.modified_timestamp >= (
         {{ this }}
 )
 {% endif %}
-qualify(ROW_NUMBER() over (PARTITION BY p.hour, COALESCE(b.token_address,p.token_address)
-                    ORDER BY
-                    hour DESC)) = 1
+
+qualify(ROW_NUMBER() over (PARTITION BY p.hour, LOWER(COALESCE(b.token_address, p.token_address))
+ORDER BY
+    HOUR DESC)) = 1
