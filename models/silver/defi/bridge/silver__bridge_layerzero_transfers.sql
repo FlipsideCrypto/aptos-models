@@ -171,7 +171,6 @@ SELECT
         event_data :amount,
         event_data :amount_ld
     ) :: INT AS amount_unadj,
-    A.event_index,
     {{ dbt_utils.generate_surrogate_key(
         ['a.tx_hash','a.event_index']
     ) }} AS bridge_layerzero_transfers_id,

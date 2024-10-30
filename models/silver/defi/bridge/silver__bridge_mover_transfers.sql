@@ -84,7 +84,6 @@ SELECT
     'aptos' AS destination_chain_name,
     payload :type_arguments [0] :: STRING AS token_address,
     event_data :amount :: INT AS amount_unadj,
-    A.event_index,
     {{ dbt_utils.generate_surrogate_key(
         ['a.tx_hash']
     ) }} AS bridge_mover_transfers_id,
@@ -127,7 +126,6 @@ SELECT
     ) :: STRING AS destination_chain_name,
     payload :type_arguments [0] :: STRING AS token_address,
     COALESCE(TRY_CAST(payload :arguments [0] :: STRING AS INT), event_data :amount_before :: INT) AS amount_unadj,
-    A.event_index,
     {{ dbt_utils.generate_surrogate_key(
         ['a.tx_hash']
     ) }} AS bridge_mover_transfers_id,

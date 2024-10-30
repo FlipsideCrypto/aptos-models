@@ -51,36 +51,20 @@ FROM
     {{ ref('defi__fact_dex_swaps') }} A
     LEFT JOIN {{ ref('core__dim_tokens') }}
     t_in
-    ON LOWER(
-        A.token_in
-    ) = LOWER(
-        t_in.token_address
-    )
+    ON A.token_in = t_in.token_address
     LEFT JOIN {{ ref('core__dim_tokens') }}
     t_out
-    ON LOWER(
-        A.token_out
-    ) = LOWER(
-        t_out.token_address
-    )
+    ON A.token_out = t_out.token_address
     LEFT JOIN {{ ref('price__ez_prices_hourly') }}
     p_in
-    ON LOWER(
-        A.token_in
-    ) = LOWER(
-        p_in.token_address
-    )
+    ON A.token_in = p_in.token_address
     AND DATE_TRUNC(
         'hour',
         block_timestamp
     ) = p_in.hour
     LEFT JOIN {{ ref('price__ez_prices_hourly') }}
     p_out
-    ON LOWER(
-        A.token_out
-    ) = LOWER(
-        p_out.token_address
-    )
+    ON A.token_out = p_out.token_address
     AND DATE_TRUNC(
         'hour',
         block_timestamp
