@@ -93,6 +93,7 @@ SELECT
     END AS destination_chain_name,
     event_data :coin_id :: STRING AS token_address,
     event_data :amt :: INT AS amount_unadj,
+    A.event_index,
     {{ dbt_utils.generate_surrogate_key(
         ['a.tx_hash']
     ) }} AS bridge_celer_transfers_id,
@@ -135,6 +136,7 @@ SELECT
     'Aptos' AS destination_chain_name,
     event_data :coin_id :: STRING AS token_address,
     event_data :amt :: INT AS amount_unadj,
+    A.event_index,
     {{ dbt_utils.generate_surrogate_key(
         ['a.tx_hash']
     ) }} AS bridge_celer_transfers_id,
