@@ -29,7 +29,7 @@ models:
       - name: FACT_TRANSFERS_ID
         description: '{{ doc("pk") }}' 
         tests:
-          - unique
+          - unique:
               Where: block_timestamp::Date > current_Date-3 
       - name: INSERTED_TIMESTAMP
         description: '{{ doc("inserted_timestamp") }}'   
