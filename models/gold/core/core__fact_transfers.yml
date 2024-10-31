@@ -27,7 +27,10 @@ models:
       - name: TOKEN_ADDRESS
         description: '{{ doc("token_address") }}'      
       - name: FACT_TRANSFERS_ID
-        description: '{{ doc("pk") }}'   
+        description: '{{ doc("pk") }}' 
+        tests:
+          - unique
+              Where: block_timestamp::Date > current_Date-3 
       - name: INSERTED_TIMESTAMP
         description: '{{ doc("inserted_timestamp") }}'   
       - name: MODIFIED_TIMESTAMP

@@ -7,8 +7,51 @@
     tags = ['noncore']
 ) }}
 
-WITH tx AS (
+{% if execute %}
 
+{% if is_incremental() %}
+{% set max_mod_query %}
+
+SELECT
+    MAX(modified_timestamp) modified_timestamp
+FROM
+    {{ this }}
+
+    {% endset %}
+    {% set max_mod = run_query(max_mod_query) [0] [0] %}
+    {% if not max_mod or max_mod == 'None' %}
+        {% set max_mod = '2099-01-01' %}
+    {% endif %}
+
+    {% set min_block_date_query %}
+SELECT
+    MIN(
+        block_timestamp :: DATE
+    )
+FROM
+    (
+        SELECT
+            MIN(block_timestamp) block_timestamp
+        FROM
+            {{ ref('silver__transactions') }} A
+        WHERE
+            modified_timestamp >= '{{max_mod}}'
+        UNION ALL
+        SELECT
+            MIN(block_timestamp) block_timestamp
+        FROM
+            {{ ref('silver__events') }} A
+        WHERE
+            modified_timestamp >= '{{max_mod}}'
+    ) {% endset %}
+    {% set min_bd = run_query(min_block_date_query) [0] [0] %}
+    {% if not min_bd or min_bd == 'None' %}
+        {% set min_bd = '2099-01-01' %}
+    {% endif %}
+{% endif %}
+{% endif %}
+
+WITH tx AS (
     SELECT
         tx_hash,
         block_timestamp,
@@ -20,6 +63,10 @@ WITH tx AS (
         ) }}
     WHERE
         success
+
+{% if is_incremental() %}
+AND block_timestamp :: DATE >= '{{min_bd}}'
+{% endif %}
 ),
 evnts AS (
     SELECT
@@ -42,6 +89,10 @@ evnts AS (
         event_address = '0x31a6675cbe84365bf2b0cbce617ece6c47023ef70826533bde5203d32171dc3c'
         AND event_resource ILIKE 'SwapEvent%'
         AND success
+
+{% if is_incremental() %}
+AND block_timestamp :: DATE >= '{{min_bd}}'
+{% endif %}
 )
 SELECT
     block_number,
@@ -85,10 +136,5 @@ WHERE
     GREATEST(
         A.modified_timestamp,
         b.modified_timestamp
-    ) >= (
-        SELECT
-            MAX(modified_timestamp)
-        FROM
-            {{ this }}
-    )
+    ) >= '{{max_mod}}'
 {% endif %}
