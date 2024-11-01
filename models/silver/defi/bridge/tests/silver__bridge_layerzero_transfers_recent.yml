@@ -53,3 +53,5 @@ models:
       - name: AMOUNT_UNADJ
         tests:
           - not_null
+      - name: EVENT_INDEX
+          - not_null

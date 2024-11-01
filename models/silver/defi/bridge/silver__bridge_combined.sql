@@ -43,8 +43,6 @@ FROM
 
         {% if not loop.last %}
 
-{% if is_incremental() %}
-{% endif %}
 UNION ALL
 {% endif %}
 {% endfor %})

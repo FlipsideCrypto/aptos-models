@@ -17,25 +17,25 @@ models:
         tests:
           - not_null:
               where: block_timestamp::Date > current_Date-3 
-              name: block_timestamp_not_null_test
+              name: test_defi__block_timestamp_not_null_test
       - name: TX_HASH
         description: '{{ doc("tx_hash") }}'   
         tests:
           - not_null:
               where: block_timestamp::Date > current_Date-3 
-              name: tx_hash_not_null_test
+              name: test_defi__tx_hash_not_null_test
       - name: VERSION
         description: '{{ doc("version") }}'  
         tests:
           - not_null:
               where: block_timestamp::Date > current_Date-3 
-              name: version_not_null_test
+              name: test_defi__version_not_null_test
       - name: BRIDGE_ADDRESS
         description: '{{ doc("bridge_address") }}'
         tests:
           - not_null:
               where: block_timestamp::Date > current_Date-3 
-              name: bridge_address_not_null_test
+              name: test_defi__bridge_address_not_null_test
       - name: PLATFORM
         description: '{{ doc("bridge_platform") }}'
       - name: EVENT_NAME
@@ -55,7 +55,7 @@ models:
         tests:
           - not_null:
               where: not (block_timestamp::date ='2024-10-21' and tx_hash in ('0x49238b4dd1781d0a9afd48faddeba919a0a72775e2b490b4996c50dc78ba525e','0x206842922be81e92617e5119bf4be6ed660caa246c6bd5f18f87d3b6e0d25fcc','0x8fd8ef755ba07ac320fce358d707d3433066e5f82df509ad76bd9b6d466bc5a6','0x509d8cb84f175ecafef0ce8951dc77cc11ae997068d444285b97e3d31eb73338'))
-              name: destination_chain_name_not_null_test
+              name: test_defi__destination_chain_name_not_null_test
       - name: DESTINATION_CHAIN_ID
         description: '{{ doc("destination_chain_id") }}'
       - name: TOKEN_ADDRESS
