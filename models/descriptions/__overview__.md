@@ -40,8 +40,11 @@ There is more information on how to use dbt docs in the last section of this doc
 - [ez_native_transfers](#!/model/model.aptos_models.core__ez_native_transfers)
 
 **Defi Fact Tables:**
+- [ez_bridge_activity](#!/model/model.aptos_models.defi__ez_bridge_activity)
+- [ez_dex_swaps](#!/model/model.aptos_models.defi__ez_dex_Swaps)
 - [fact_bridge_activity](#!/model/model.aptos_models.defi__fact_bridge_activity)
 - [fact_dex_swaps](#!/model/model.aptos_models.defi__fact_dex_Swaps)
+
 
 **Defi Convenience Tables:**
 - [ez_dex_swaps](#!/model/model.aptos_models.defi__ez_dex_swaps)
