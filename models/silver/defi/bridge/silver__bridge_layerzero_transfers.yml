@@ -21,3 +21,5 @@ models:
       - name: DESTINATION_CHAIN_NAME
       - name: TOKEN_ADDRESS
       - name: AMOUNT_UNADJ
+      - name: EVENT_INDEX
+      

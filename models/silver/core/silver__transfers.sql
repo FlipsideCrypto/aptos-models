@@ -3,8 +3,7 @@
   unique_key = ['tx_hash','event_index','block_timestamp::DATE'],
   incremental_strategy = 'merge',
   merge_exclude_columns = ["inserted_timestamp"],
-  cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE'],
-  post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(tx_hash, version, account_address,token_address);",
+  cluster_by = ['block_timestamp::DATE','modified_timestamp::DATE'],
   tags = ['core','full_test']
 ) }}
 
