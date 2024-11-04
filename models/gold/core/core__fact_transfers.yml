@@ -30,7 +30,7 @@ models:
         description: '{{ doc("pk") }}' 
         tests:
           - unique:
-              Where: block_timestamp::Date > current_Date-3 
+              where: block_timestamp::Date > current_Date-3 
       - name: INSERTED_TIMESTAMP
         description: '{{ doc("inserted_timestamp") }}'   
       - name: MODIFIED_TIMESTAMP
