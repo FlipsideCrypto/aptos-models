@@ -76,21 +76,19 @@ WHERE
         FROM
             TABLE(
                 information_schema.external_table_file_registration_history(
-                    start_time => DATEADD('day', -3, CURRENT_TIMESTAMP()),
+                    start_time => DATEADD('day', -7, CURRENT_TIMESTAMP()),
                     table_name => '{{ source( "bronze_streamline", model) }}')
                 ) A
             )
         SELECT
-            {{ unique_key }},
-            DATA,
-            _inserted_timestamp,
             MD5(
                 CAST(
                     COALESCE(CAST({{ unique_key }} AS text), '' :: STRING) AS text
                 )
             ) AS id,
-            s.{{ partition_name }},
-            s.value AS VALUE
+            s.*,
+            b.file_name,
+            _inserted_timestamp
         FROM
             {{ source(
                 "bronze_streamline",
@@ -115,7 +113,9 @@ WHERE
                     '-32007',
                     '-32008',
                     '-32009',
-                    '-32010'
+                    '-32010',
+                    '-32602',
+                    '-32603'
                 )
             )
 {% endmacro %}
@@ -139,16 +139,14 @@ WHERE
             ) A
     )
 SELECT
-    {{ unique_key }},
-    DATA,
-    _inserted_timestamp,
     MD5(
         CAST(
             COALESCE(CAST({{ unique_key }} AS text), '' :: STRING) AS text
         )
     ) AS id,
-    s.{{ partition_name }},
-    s.value AS VALUE
+    s.*,
+    b.file_name,
+    _inserted_timestamp
 FROM
     {{ source(
         "bronze_streamline",
@@ -173,7 +171,78 @@ WHERE
             '-32007',
             '-32008',
             '-32009',
-            '-32010'
+            '-32010',
+            '-32602',
+            '-32603'
         )
     )
+{% endmacro %}
+
+{% macro streamline_external_table_query_v2(
+        model,
+        partition_function
+    ) %}
+    WITH meta AS (
+        SELECT
+            job_created_time AS _inserted_timestamp,
+            file_name,
+            {{ partition_function }} AS partition_key
+        FROM
+            TABLE(
+                information_schema.external_table_file_registration_history(
+                    start_time => DATEADD('day', -3, CURRENT_TIMESTAMP()),
+                    table_name => '{{ source( "bronze_streamline", model) }}')
+                ) A
+            )
+        SELECT
+            s.*,
+            b.file_name,
+            _inserted_timestamp
+        FROM
+            {{ source(
+                "bronze_streamline",
+                model
+            ) }}
+            s
+            JOIN meta b
+            ON b.file_name = metadata$filename
+            AND b.partition_key = s.partition_key
+        WHERE
+            b.partition_key = s.partition_key
+            AND DATA :error IS NULL
+
+{% endmacro %}
+
+{% macro streamline_external_table_FR_query_v2(
+        model,
+        partition_function
+    ) %}
+    WITH meta AS (
+        SELECT
+            registered_on AS _inserted_timestamp,
+            file_name,
+            {{ partition_function }} AS partition_key
+        FROM
+            TABLE(
+                information_schema.external_table_files(
+                    table_name => '{{ source( "bronze_streamline", model) }}'
+                )
+            ) A
+    )
+SELECT
+    s.*,
+    b.file_name,
+    _inserted_timestamp
+FROM
+    {{ source(
+        "bronze_streamline",
+        model
+    ) }}
+    s
+    JOIN meta b
+    ON b.file_name = metadata$filename
+    AND b.partition_key = s.partition_key
+WHERE
+    b.partition_key = s.partition_key
+    AND DATA :error IS NULL
 {% endmacro %}

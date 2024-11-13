@@ -9,6 +9,7 @@
             {% set sql %}
             {{ create_udf_bulk_json_rpc() }}
             {{ create_udf_bulk_rest_api() }}
+            {{ create_udf_bulk_rest_api_v2() }}
 
 
             {% endset %}
