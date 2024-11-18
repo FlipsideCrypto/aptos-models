@@ -49,30 +49,6 @@ WHERE
 {% do run_query(
   query_blocks
 ) %}
-{% set query_tx %}
-CREATE
-OR REPLACE temporary TABLE silver.transactions__tx_intermediate_tmp AS
-SELECT
-  DATA,
-  partition_key,
-  _inserted_timestamp
-FROM
-
-{% if is_incremental() %}
-{{ ref('bronze__streamline_transactions') }}
-{% else %}
-  {{ ref('bronze__streamline_FR_transactions') }}
-{% endif %}
-
-{% if is_incremental() %}
-WHERE
-  _inserted_timestamp >= '{{max_ins}}'
-{% endif %}
-
-{% endset %}
-{% do run_query(
-  query_tx
-) %}
 {% set query_tx_batch %}
 CREATE
 OR REPLACE temporary TABLE silver.transactions_tx_batch_intermediate_tmp AS
@@ -102,7 +78,7 @@ WHERE
 
 WITH from_blocks AS (
   SELECT
-    partition_key AS block_number,
+    a.data :block_height :: INT AS block_number,
     TO_TIMESTAMP(
       DATA :block_timestamp :: STRING
     ) AS block_timestamp,
@@ -147,48 +123,6 @@ WITH from_blocks AS (
     LATERAL FLATTEN (
       DATA :transactions
     ) b
-),
-from_transactions AS (
-  SELECT
-    {# b.block_number, #}
-    TO_TIMESTAMP(
-      DATA :timestamp :: STRING
-    ) AS block_timestamp,
-    DATA :hash :: STRING AS tx_hash,
-    DATA :version :: INT AS version,
-    DATA :success :: BOOLEAN AS success,
-    DATA :type :: STRING AS tx_type,
-    DATA :accumulator_root_hash :: STRING AS accumulator_root_hash,
-    DATA :changes AS changes,
-    DATA :epoch :: INT AS epoch,
-    DATA :event_root_hash :: STRING AS event_root_hash,
-    DATA :events AS events,
-    DATA :expiration_timestamp_secs :: bigint AS expiration_timestamp_secs,
-    DATA: failed_proposer_indices AS failed_proposer_indices,
-    DATA: gas_unit_price :: bigint AS gas_unit_price,
-    DATA :gas_used :: INT AS gas_used,
-    DATA :id :: STRING AS id,
-    DATA :max_gas_amount :: bigint AS max_gas_amount,
-    DATA :payload AS payload,
-    DATA :payload :function :: STRING AS payload_function,
-    DATA :previous_block_votes_bitvec AS previous_block_votes_bitvec,
-    DATA :proposer :: STRING AS proposer,
-    DATA :round :: INT AS ROUND,
-    DATA :sender :: STRING AS sender,
-    DATA :signature :: STRING AS signature,
-    DATA :state_change_hash :: STRING AS state_change_hash,
-    DATA :state_checkpoint_hash :: STRING AS state_checkpoint_hash,
-    DATA :timestamp :: bigint AS TIMESTAMP,
-    DATA :vm_status :: STRING AS vm_status,
-    {{ dbt_utils.generate_surrogate_key(
-      ['tx_hash']
-    ) }} AS transactions_id,
-    SYSDATE() AS inserted_timestamp,
-    SYSDATE() AS modified_timestamp,
-    A._inserted_timestamp,
-    '{{ invocation_id }}' AS _invocation_id
-  FROM
-    silver.transactions__tx_intermediate_tmp A
 ),
 from_transaction_batch AS (
   SELECT
@@ -235,17 +169,6 @@ from_transaction_batch AS (
       A.data
     ) b
 ),
-tx_combo AS (
-  SELECT
-    *
-  FROM
-    from_transactions
-  UNION ALL
-  SELECT
-    *
-  FROM
-    from_transaction_batch
-),
 combo AS (
   SELECT
     *
@@ -256,7 +179,7 @@ combo AS (
     b.block_number,
     A.*
   FROM
-    tx_combo A
+    from_transaction_batch A
     JOIN {{ ref('silver__blocks') }}
     b
     ON A.version BETWEEN b.first_version

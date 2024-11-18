@@ -25,15 +25,12 @@
 {% endmacro %}
 
 {% macro create_udf_bulk_rest_api_v2() %}
-    {% if target.name == "prod" %}
-        CREATE OR REPLACE EXTERNAL FUNCTION streamline.udf_bulk_rest_api_v2(
-            json OBJECT
-        ) returns ARRAY api_integration = aws_aptos_api AS
-            'https://dedvhh9fi1.execute-api.us-east-1.amazonaws.com/prod/udf_bulk_rest_api'
+    CREATE
+    OR REPLACE EXTERNAL FUNCTION streamline.udf_bulk_rest_api_v2(
+        json OBJECT
+    ) returns ARRAY api_integration = {% if target.name == "prod" %}
+        aws_aptos_api_prod_v2 AS ''
     {% else %}
-        CREATE OR REPLACE EXTERNAL FUNCTION streamline.udf_bulk_rest_api(
-            json OBJECT
-        ) returns ARRAY api_integration = aws_aptos_api_dev AS
-            'https://9v6g64rv1e.execute-api.us-east-1.amazonaws.com/stg/udf_bulk_rest_api'
+        aws_aptos_api_stg_v2 AS 'https://9v6g64rv1e.execute-api.us-east-1.amazonaws.com/stg/udf_bulk_rest_api'
     {%- endif %};
 {% endmacro %}

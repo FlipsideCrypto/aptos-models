@@ -10,7 +10,7 @@
 -- depends_on: {{ ref('bronze__streamline_blocks_tx') }}
 
 SELECT
-    partition_key AS block_number,
+    DATA :block_height :: INT AS block_number,
     DATA :block_hash :: STRING AS block_hash,
     DATA :block_timestamp :: bigint AS block_timestamp_num,
     TO_TIMESTAMP(
