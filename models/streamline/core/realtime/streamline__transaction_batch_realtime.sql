@@ -8,7 +8,8 @@
             "sql_limit": "1200000",
             "producer_batch_size": "300000",
             "worker_batch_size": "50000",
-            "sql_source": "{{this.identifier}}" }
+            "sql_source": "{{this.identifier}}",
+            "order_by_column": "block_number" }
     ),
     tags = ['streamline_core_realtime']
 ) }}
@@ -72,7 +73,7 @@ SELECT
         block_number,
         -3
     ) :: INT AS partition_key,
-    aptos_dev.live.udf_api(
+    {{ target.database }}.live.udf_api(
         'GET',
         '{service}/{Authentication}/v1/transactions?start=' || tx_version || '&limit=100',
         object_construct(
@@ -86,6 +87,3 @@ SELECT
     ) AS request
 FROM
     work
-ORDER BY
-    block_number
-limit 10

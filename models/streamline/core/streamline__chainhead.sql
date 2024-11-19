@@ -4,7 +4,7 @@
 ) }}
 
   SELECT
-    aptos.live.udf_api(
+    {{ target.database }}.live.udf_api(
         'GET',
         '{service}/{Authentication}/v1',
         OBJECT_CONSTRUCT(

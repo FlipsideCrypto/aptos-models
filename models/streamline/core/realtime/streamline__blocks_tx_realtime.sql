@@ -4,10 +4,11 @@
         func = 'streamline.udf_bulk_rest_api_v2',
         target = "{{this.schema}}.{{this.identifier}}",
         params ={ "external_table" :"blocks_tx_v2",
-        "sql_limit" :"1200000",
+        "sql_limit" :"10",
         "producer_batch_size" :"300000",
         "worker_batch_size" :"50000",
-        "sql_source" :"{{this.identifier}}" }
+        "sql_source" :"{{this.identifier}}",
+        "order_by_column": "block_number" }
     ),
     tags = ['streamline_core_realtime']
 ) }}
@@ -22,13 +23,6 @@ WITH blocks AS (
         block_number
     FROM
         {{ ref("streamline__complete_blocks_tx") }}
-    WHERE
-        block_number < 252143860
-    EXCEPT
-    SELECT
-        block_number
-    FROM
-        {{ ref("streamline__complete_blocks_tx") }}
 )
 SELECT
     ROUND(
@@ -36,7 +30,7 @@ SELECT
         -3
     ) :: INT AS partition_key,
     block_number,
-    aptos_dev.live.udf_api(
+    {{ target.database }}.live.udf_api(
         'GET',
         '{service}/{Authentication}/v1/blocks/by_height/' || block_number || '?with_transactions=true',
         object_construct(
@@ -50,6 +44,3 @@ SELECT
     ) AS request
 FROM
     blocks
-ORDER BY
-    block_number
-limit 10
