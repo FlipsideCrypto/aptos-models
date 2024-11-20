@@ -76,19 +76,21 @@ WHERE
         FROM
             TABLE(
                 information_schema.external_table_file_registration_history(
-                    start_time => DATEADD('day', -7, CURRENT_TIMESTAMP()),
+                    start_time => DATEADD('day', -3, CURRENT_TIMESTAMP()),
                     table_name => '{{ source( "bronze_streamline", model) }}')
                 ) A
             )
         SELECT
+            {{ unique_key }},
+            DATA,
+            _inserted_timestamp,
             MD5(
                 CAST(
                     COALESCE(CAST({{ unique_key }} AS text), '' :: STRING) AS text
                 )
             ) AS id,
-            s.*,
-            b.file_name,
-            _inserted_timestamp
+            s.{{ partition_name }},
+            s.value AS VALUE
         FROM
             {{ source(
                 "bronze_streamline",
@@ -113,9 +115,7 @@ WHERE
                     '-32007',
                     '-32008',
                     '-32009',
-                    '-32010',
-                    '-32602',
-                    '-32603'
+                    '-32010'
                 )
             )
 {% endmacro %}
@@ -139,14 +139,16 @@ WHERE
             ) A
     )
 SELECT
+    {{ unique_key }},
+    DATA,
+    _inserted_timestamp,
     MD5(
         CAST(
             COALESCE(CAST({{ unique_key }} AS text), '' :: STRING) AS text
         )
     ) AS id,
-    s.*,
-    b.file_name,
-    _inserted_timestamp
+    s.{{ partition_name }},
+    s.value AS VALUE
 FROM
     {{ source(
         "bronze_streamline",
@@ -171,9 +173,7 @@ WHERE
             '-32007',
             '-32008',
             '-32009',
-            '-32010',
-            '-32602',
-            '-32603'
+            '-32010'
         )
     )
 {% endmacro %}

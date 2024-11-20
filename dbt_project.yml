@@ -88,7 +88,7 @@ vars:
         - INTERNAL_DEV
     prod:
       API_INTEGRATION: aws_aptos_api_prod_v2
-      EXTERNAL_FUNCTION_URI: 9v6g64rv1e.execute-api.us-east-1.amazonaws.com/stg/
+      EXTERNAL_FUNCTION_URI: mxus3semvi.execute-api.us-east-1.amazonaws.com/prod/
       ROLES:
         - AWS_LAMBDA_APTOS_API
         - DBT_CLOUD_APTOS
