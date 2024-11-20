@@ -38,6 +38,8 @@ models:
     relation: true
     columns: true
   +on_schema_change: "append_new_columns"
+  aptos_models:
+    +pre-hook: '{{ fsc_utils.set_query_tag() }}' 
 
   dbt_constraints_sources_nn_enabled: false
 
@@ -70,6 +72,12 @@ vars:
   OBSERV_FULL_TEST: FALSE
   START_GHA_TASKS: FALSE
   UPDATE_UDFS_AND_SPS: FALSE
+  core_folders: [
+    'silver/core',
+    'gold/core',
+    'bronze/core',  
+    'streamline'
+  ]
 
 
 #### STREAMLINE 2.0 BEGIN ####
