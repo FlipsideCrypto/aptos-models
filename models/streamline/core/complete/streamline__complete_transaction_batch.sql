@@ -2,14 +2,14 @@
 {{ config (
     materialized = "incremental",
     unique_key = "block_number",
-    cluster_by = "ROUND(_partition_by_block_id, -3)",
+    cluster_by = "ROUND(partition_key, -3)",
     post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION on equality(block_number)"
 ) }}
 -- depends_on: {{ ref('bronze__streamline_transaction_batch') }}
 
 SELECT
     block_number,
-    _partition_by_block_id,
+    partition_key,
     A._inserted_timestamp
 FROM
 
