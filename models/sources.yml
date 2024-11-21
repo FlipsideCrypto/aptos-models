@@ -38,4 +38,8 @@ sources:
       - name: blocks_tx
       - name: transactions
       - name: transaction_batch
+      - name: blocks_tx_v2
+      - name: transaction_batch_v2
+
+
   
