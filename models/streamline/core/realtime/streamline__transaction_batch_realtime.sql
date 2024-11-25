@@ -73,6 +73,7 @@ SELECT
         block_number,
         -3
     ) :: INT AS partition_key,
+    block_number,
     {{ target.database }}.live.udf_api(
         'GET',
         '{service}/{Authentication}/v1/transactions?start=' || tx_version || '&limit=100',
