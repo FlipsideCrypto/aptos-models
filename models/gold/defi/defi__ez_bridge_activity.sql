@@ -22,7 +22,7 @@ SELECT
     tx_sender,
     sender,
     receiver,
-    source_chain_name AS soruce_chain,
+    source_chain_name AS source_chain,
     destination_chain_name AS destination_chain,
     A.token_address,
     COALESCE(
