@@ -9,7 +9,7 @@
 ) }}
 
 SELECT
-    DATA : block_height :: INT AS block_number,
+    DATA: block_height :: INT AS block_number,
     {{ dbt_utils.generate_surrogate_key(
         ['block_number']
     ) }} AS complete_blocks_id,
@@ -21,16 +21,20 @@ FROM
 
 {% if is_incremental() %}
 {{ ref('bronze__streamline_blocks_tx') }}
+{% else %}
+    {{ ref('bronze__streamline_FR_blocks_tx') }}
+{% endif %}
 WHERE
-    _inserted_timestamp >= (
-        SELECT
-            COALESCE(MAX(_INSERTED_TIMESTAMP), '1970-01-01' :: DATE) max_INSERTED_TIMESTAMP
-        FROM
-            {{ this }})
-        {% else %}
-            {{ ref('bronze__streamline_FR_blocks_tx') }}
-        {% endif %}
+    block_number IS NOT NULL
 
-        qualify(ROW_NUMBER() over (PARTITION BY block_number
-        ORDER BY
-            _inserted_timestamp DESC)) = 1
+{% if is_incremental() %}
+AND _inserted_timestamp >= (
+    SELECT
+        COALESCE(MAX(_INSERTED_TIMESTAMP), '1970-01-01' :: DATE) max_INSERTED_TIMESTAMP
+    FROM
+        {{ this }})
+    {% endif %}
+
+    qualify(ROW_NUMBER() over (PARTITION BY block_number
+    ORDER BY
+        _inserted_timestamp DESC)) = 1

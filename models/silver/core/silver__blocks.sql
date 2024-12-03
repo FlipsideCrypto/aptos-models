@@ -44,8 +44,9 @@ WHERE
     )
 {% else %}
     {{ ref('bronze__streamline_FR_blocks_tx') }}
+WHERE
+    1 = 1
 {% endif %}
-
-qualify(ROW_NUMBER() over(PARTITION BY block_number
+AND block_number IS NOT NULL qualify(ROW_NUMBER() over(PARTITION BY block_number
 ORDER BY
     _inserted_timestamp DESC)) = 1
