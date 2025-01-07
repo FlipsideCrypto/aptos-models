@@ -6,7 +6,7 @@
         params ={ "external_table" :"blocks_tx_v2",
         "sql_limit" :"1200000",
         "producer_batch_size" :"300000",
-        "worker_batch_size" :"50000",
+        "worker_batch_size" :"25000",
         "sql_source" :"{{this.identifier}}",
         "order_by_column": "block_number" }
     ),
