@@ -142,3 +142,8 @@ FROM
   AND e.creation_number = wth.creation_number
   AND e.account_address = wth.address
   AND e.event_resource = 'WithdrawEvent'
+WHERE
+  NOT (
+    e.block_timestamp :: DATE = '2025-01-11'
+    AND e.version = 2186504987
+  )
