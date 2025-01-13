@@ -143,4 +143,7 @@ FROM
   AND e.account_address = wth.address
   AND e.event_resource = 'WithdrawEvent'
 WHERE
-  token_address IS NOT NULL
+  COALESCE(
+    dep.token_address,
+    wth.token_address
+  ) IS NOT NULL
