@@ -45,6 +45,7 @@ AND _inserted_timestamp >= (
     FROM
         {{ this }}
 )
+AND _inserted_timestamp >= CURRENT_DATE -3
 {% endif %}
 ),
 evnts_2 AS (
