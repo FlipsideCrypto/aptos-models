@@ -478,4 +478,9 @@ FROM
         '0x6a03eb973cd9385d62fc2842d02a4dd6b70e52f5da77a0689e57e48d93fae1b4',
         '0x41699a1297fba9645eae628d909966659d2da5a425911c3d7bccd54ffce6606a',
         '0xe11c12ec495f3989c35e1c6a0af414451223305b579291fc8f3d9d0575a23c26'
-    )
+    ) qualify ROW_NUMBER() over (
+        PARTITION BY main.tx_hash,
+        main.event_index
+        ORDER BY
+            platform.event_index DESC
+    ) = 1
