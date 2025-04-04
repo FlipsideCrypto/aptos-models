@@ -1,7 +1,7 @@
 version: 2
 models:
   - name: defi__ez_bridge_activity
-    description: '{{ doc("defi__fact_bridge_activity") }}'
+    description: '{{ doc("defi__ez_bridge_activity") }}'
     tests:
       - dbt_constraints.primary_key:
           column_name: ez_bridge_activity_id
