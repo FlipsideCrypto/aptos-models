@@ -8,30 +8,56 @@
     tags = ['core','full_test']
 ) }}
 
-SELECT
-    block_number,
-    block_timestamp,
-    tx_hash,
-    version,
-    success,
-    event_index,
-    creation_number,
-    transfer_event,
-    account_address,
-    amount,
-    token_address,
-    transfers_id AS fact_transfers_id,
-    inserted_timestamp,
-    modified_timestamp
-FROM
-    {{ ref(
-        'silver__transfers'
-    ) }}
-WHERE
-    amount <> 0
+WITH combined_transfers AS (
+    -- Original silver__transfers
+    SELECT
+        block_number,
+        block_timestamp,
+        tx_hash,
+        version,
+        success,
+        event_index,
+        creation_number,
+        transfer_event,
+        account_address,
+        amount,
+        token_address,
+        transfers_id AS fact_transfers_id,
+        inserted_timestamp,
+        modified_timestamp
+    FROM
+        {{ ref('silver__transfers') }}
+    WHERE
+        amount <> 0
+    
+    UNION ALL
+    
+    -- Adding silver_transfers_usdt
+    SELECT
+        block_number,
+        block_timestamp,
+        tx_hash,
+        version,
+        success,
+        event_index,
+        creation_number,
+        transfer_event,
+        account_address,
+        amount,
+        token_address,
+        transfers_id AS fact_transfers_id,
+        inserted_timestamp,
+        modified_timestamp
+    FROM
+        {{ ref('silver_transfers_usdt') }}
+    WHERE
+        amount <> 0
+)
+
+SELECT * FROM combined_transfers
 
 {% if is_incremental() %}
-AND modified_timestamp >= (
+WHERE modified_timestamp >= (
     SELECT
         MAX(modified_timestamp)
     FROM
