@@ -32,7 +32,7 @@ WITH combined_transfers AS (
     
     UNION ALL
     
-    -- Adding silver_transfers_usdt
+    -- Adding silver__transfers_usdt
     SELECT
         block_number,
         block_timestamp,
@@ -49,7 +49,7 @@ WITH combined_transfers AS (
         inserted_timestamp,
         modified_timestamp
     FROM
-        {{ ref('silver_transfers_usdt') }}
+        {{ ref('silver__transfers_usdt') }}
     WHERE
         amount <> 0
 )

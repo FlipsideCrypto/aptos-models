@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: silver_transfers_usdt
+  - name: silver__transfers_usdt
     tests:
       - dbt_constraints.primary_key:
           column_name: TRANSFERS_ID
@@ -50,9 +50,9 @@ models:
           - not_null
       - name: _INSERTED_TIMESTAMP
         tests:
-          - name: not_null_silver_transfers_usdt_INSERTED_TIMESTAMP_
+          - name: not_null_silver__transfers_usdt_INSERTED_TIMESTAMP_
             test_name: not_null
       - name: _INVOCATION_ID
         tests:
-          - name: not_null_silver_transfers_usdt_INVOCATION_ID
+          - name: not_null_silver__transfers_usdt_INVOCATION_ID
             test_name: not_null 

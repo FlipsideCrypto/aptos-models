@@ -26,8 +26,8 @@ WITH events AS (
   WHERE
     event_module = 'fungible_asset'
     AND event_resource IN ('WithdrawEvent', 'DepositEvent')
-    -- Add date filter for last 2 days
-    AND block_timestamp :: DATE >= DATEADD('day', -1, CURRENT_DATE())
+    -- Changed from last 7 days to specific date
+    AND block_timestamp :: DATE = '2023-08-03'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
@@ -56,8 +56,8 @@ chnges AS (
       creation_number_deposit IS NOT NULL
       OR creation_number_withdraw IS NOT NULL
     )
-    -- Add the same date filter here
-    AND block_timestamp :: DATE >= DATEADD('day', -1, CURRENT_DATE())
+    -- Changed from last 7 days to specific date
+    AND block_timestamp :: DATE = '2023-08-03'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
