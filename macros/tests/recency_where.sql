@@ -1,18 +1,8 @@
 {% test recency_where(model, field, datepart, interval, where, ignore_time_component=False, group_by_columns = []) %}
-  {% if where %}
-    {% set filtered_model %}
-    (
-      select * from {{ model }}
-      where {{ where }}
-    )
-    {% endset %}
-    {{ return(adapter.dispatch('test_recency', 'dbt_utils')(filtered_model, field, datepart, interval, ignore_time_component, group_by_columns)) }}
-  {% else %}
-    {{ return(adapter.dispatch('test_recency', 'dbt_utils')(model, field, datepart, interval, ignore_time_component, group_by_columns)) }}
-  {% endif %}
-{% endtest %}
-
-{% macro default__test_recency_where(model, field, datepart, interval, where, ignore_time_component, group_by_columns) %}
+  {#
+    This is a custom implementation that doesn't depend on other macros.
+    It's duplicated from dbt_utils.recency, but modified to include a where clause.
+  #}
 
 {% set threshold = 'cast(' ~ dbt.dateadd(datepart, interval * -1, dbt.current_timestamp()) ~ ' as ' ~ ('date' if ignore_time_component else dbt.type_timestamp()) ~ ')'  %}
 
@@ -51,4 +41,4 @@ select
 from recency
 where most_recent < {{ threshold }}
 
-{% endmacro %}
+{% endtest %}
