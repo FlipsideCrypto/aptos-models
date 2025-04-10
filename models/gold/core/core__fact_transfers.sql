@@ -8,8 +8,7 @@
     tags = ['core','full_test']
 ) }}
 
-WITH combined_transfers AS (
-    -- Original silver__transfers
+WITH silver_transfers AS (
     SELECT
         block_number,
         block_timestamp,
@@ -29,10 +28,17 @@ WITH combined_transfers AS (
         {{ ref('silver__transfers') }}
     WHERE
         amount <> 0
-    
-    UNION ALL
-    
-    -- Adding silver__transfers_usdt
+        {% if is_incremental() %}
+        AND modified_timestamp >= (
+            SELECT
+                MAX(modified_timestamp)
+            FROM
+                {{ this }}
+        )
+        {% endif %}
+),
+
+silver_transfers_usdt AS (
     SELECT
         block_number,
         block_timestamp,
@@ -52,15 +58,23 @@ WITH combined_transfers AS (
         {{ ref('silver__transfers_usdt') }}
     WHERE
         amount <> 0
-)
+        {% if is_incremental() %}
+        AND modified_timestamp >= (
+            SELECT
+                MAX(modified_timestamp)
+            FROM
+                {{ this }}
+        )
+        {% endif %}
+),
+
+combined_transfers AS (
+
+    SELECT * FROM silver_transfers
+    
+    UNION ALL
+    
+    SELECT * FROM silver_transfers_usdt
+)    
 
 SELECT * FROM combined_transfers
-
-{% if is_incremental() %}
-WHERE modified_timestamp >= (
-    SELECT
-        MAX(modified_timestamp)
-    FROM
-        {{ this }}
-)
-{% endif %}

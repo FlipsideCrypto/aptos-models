@@ -25,9 +25,8 @@ WITH events AS (
     {{ ref('silver__events') }}
   WHERE
     event_module = 'fungible_asset'
-    AND event_resource IN ('WithdrawEvent', 'DepositEvent')
-    -- Changed from last 7 days to specific date
-    AND block_timestamp :: DATE = '2023-08-03'
+    AND event_resource IN ('WithdrawEvent', 'DepositEvent', 'Withdraw', 'Deposit')
+
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
@@ -43,21 +42,12 @@ chnges AS (
     block_timestamp :: DATE AS block_date,
     tx_hash,
     change_index,
-    change_data,
-    change_data :deposit_events :guid :id :creation_num :: INT AS creation_number_deposit,
-    change_data :withdraw_events :guid :id :creation_num :: INT AS creation_number_withdraw,
-    address,
-    change_resource AS token_address
+    change_data:metadata:inner::string AS token_address
   FROM
     {{ ref('silver__changes') }}
   WHERE
     change_module = 'fungible_asset'
-    AND (
-      creation_number_deposit IS NOT NULL
-      OR creation_number_withdraw IS NOT NULL
-    )
-    -- Changed from last 7 days to specific date
-    AND block_timestamp :: DATE = '2023-08-03'
+    AND change_data:metadata:inner::string = '0x357b0b74bc833e95a115ad22604854d6b0fca151cecd94111770e5d6ffc9dc2b'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
@@ -67,35 +57,9 @@ AND _inserted_timestamp >= (
     {{ this }}
 )
 {% endif %}
-),
-chnges_dep AS (
-  SELECT
-    block_date,
-    tx_hash,
-    address,
-    creation_number_deposit AS creation_number,
-    token_address
-  FROM
-    chnges
-  WHERE
-    creation_number_deposit IS NOT NULL qualify(ROW_NUMBER() over(PARTITION BY tx_hash, creation_number_deposit, address
-  ORDER BY
-    change_index DESC) = 1)
-),
-chnges_wth AS (
-  SELECT
-    block_date,
-    tx_hash,
-    address,
-    creation_number_withdraw AS creation_number,
-    token_address
-  FROM
-    chnges
-  WHERE
-    creation_number_withdraw IS NOT NULL qualify(ROW_NUMBER() over(PARTITION BY tx_hash, creation_number_withdraw, address
-  ORDER BY
-    change_index DESC) = 1)
+qualify(ROW_NUMBER() over(PARTITION BY tx_hash ORDER BY change_index DESC) = 1)
 )
+
 SELECT
   e.block_number,
   e.block_timestamp,
@@ -107,16 +71,7 @@ SELECT
   e.event_resource AS transfer_event,
   e.account_address,
   e.amount,
-  REPLACE(
-    REPLACE(
-      COALESCE(
-        dep.token_address,
-        wth.token_address
-      ),
-      'CoinStore<'
-    ),
-    '>'
-  ) AS token_address,
+  c.token_address,
   {{ dbt_utils.generate_surrogate_key(
     ['e.tx_hash','e.event_index']
   ) }} AS transfers_id,
@@ -126,20 +81,8 @@ SELECT
   '{{ invocation_id }}' AS _invocation_id
 FROM
   events e
-  LEFT JOIN chnges_dep dep
-  ON e.block_date = dep.block_date
-  AND e.tx_hash = dep.tx_hash
-  AND e.creation_number = dep.creation_number
-  AND e.account_address = dep.address
-  AND e.event_resource = 'DepositEvent'
-  LEFT JOIN chnges_wth wth
-  ON e.block_date = wth.block_date
-  AND e.tx_hash = wth.tx_hash
-  AND e.creation_number = wth.creation_number
-  AND e.account_address = wth.address
-  AND e.event_resource = 'WithdrawEvent'
-WHERE
-  COALESCE(
-    dep.token_address,
-    wth.token_address
-  ) IS NOT NULL
+  INNER JOIN chnges c
+  ON e.block_date = c.block_date
+  AND e.tx_hash = c.tx_hash
+WHERE 
+  e.event_resource IN ('DepositEvent', 'Deposit','WithdrawEvent', 'Withdraw')
