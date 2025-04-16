@@ -10,6 +10,7 @@ SELECT
   block_timestamp::DATE AS block_date,
   block_number,
   tx_hash,
+  change_index,
   address AS store_address,
   change_data:owner::STRING AS owner_address,
   _inserted_timestamp
