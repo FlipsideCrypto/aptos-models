@@ -1,0 +1,46 @@
+version: 2
+
+models:
+  - name: silver__store_owners
+    description: |
+      Tracks ownership of stores over time, capturing the latest owner for each store address.
+      This model is primarily used for fungible asset tracking, including USDT.
+      The model processes data from the last 30 days and maintains incremental updates.
+    
+    columns:
+      - name: block_timestamp
+        description: Timestamp of the block when the ownership change occurred
+        tests:
+          - not_null
+      
+      - name: block_date
+        description: Date of the block when the ownership change occurred
+        tests:
+          - not_null
+      
+      - name: block_number
+        description: Block number of the ownership change
+        tests:
+          - not_null
+          - unique
+      
+      - name: tx_hash
+        description: Transaction hash of the ownership change
+        tests:
+          - not_null
+          - unique
+      
+      - name: store_address
+        description: Address of the store
+        tests:
+          - not_null
+      
+      - name: owner_address
+        description: Address of the current owner
+        tests:
+          - not_null
+      
+      - name: _inserted_timestamp
+        description: Timestamp when the record was inserted into the table
+        tests:
+          - not_null 

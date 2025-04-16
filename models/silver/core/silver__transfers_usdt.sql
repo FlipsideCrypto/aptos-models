@@ -29,7 +29,6 @@ WITH events AS (
   WHERE
     event_module = 'fungible_asset'
     AND event_resource IN ('WithdrawEvent', 'DepositEvent', 'Withdraw', 'Deposit')
-   AND block_timestamp between '2025-01-23' and '2025-01-25'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
@@ -51,7 +50,6 @@ chnges AS (
   WHERE
     change_module = 'fungible_asset'
     AND change_data:metadata:inner::string = '0x357b0b74bc833e95a115ad22604854d6b0fca151cecd94111770e5d6ffc9dc2b'
-    AND block_timestamp between '2025-01-23' and '2025-01-25'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
