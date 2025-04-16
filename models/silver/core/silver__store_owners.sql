@@ -27,9 +27,6 @@ WHERE
     FROM
       {{ this }}
   )
-  {% else %}
-  -- Use fixed date range for initial load
-  AND block_timestamp between '2025-02-20' and '2025-02-22'
   {% endif %}
 QUALIFY 
   ROW_NUMBER() OVER (PARTITION BY address ORDER BY block_number DESC) = 1

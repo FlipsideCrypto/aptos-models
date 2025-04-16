@@ -31,8 +31,6 @@ FROM
 WHERE
     change_module = 'fungible_asset'
     AND change_resource = 'FungibleStore'
-    -- You can adjust this date filter as needed
-    AND block_timestamp::DATE > CURRENT_DATE - 30
 
     {% if is_incremental() %}
     AND _inserted_timestamp >= (
