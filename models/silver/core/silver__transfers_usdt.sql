@@ -7,6 +7,8 @@
   tags = ['core','full_test']
 ) }}
 
+-- USDT Token Metadata Address: 0x357b0b74bc833e95a115ad22604854d6b0fca151cecd94111770e5d6ffc9dc2b
+
 WITH events AS (
   SELECT
     block_number,
@@ -18,7 +20,8 @@ WITH events AS (
     event_index,
     event_resource,
     event_data :amount :: bigint AS amount,
-    account_address,
+    -- Extract store address from event data if available, otherwise use account_address
+    COALESCE(event_data :store :: STRING, account_address) AS account_address,
     creation_number,
     _inserted_timestamp
   FROM
@@ -26,7 +29,7 @@ WITH events AS (
   WHERE
     event_module = 'fungible_asset'
     AND event_resource IN ('WithdrawEvent', 'DepositEvent', 'Withdraw', 'Deposit')
-
+   AND block_timestamp between '2025-01-23' and '2025-01-25'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
@@ -48,6 +51,7 @@ chnges AS (
   WHERE
     change_module = 'fungible_asset'
     AND change_data:metadata:inner::string = '0x357b0b74bc833e95a115ad22604854d6b0fca151cecd94111770e5d6ffc9dc2b'
+    AND block_timestamp between '2025-01-23' and '2025-01-25'
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (
