@@ -1,6 +1,6 @@
 {{ config(
   materialized = 'incremental',
-  unique_key = ['store_address', 'block_number'],
+  unique_key = ['store_address'],
   incremental_strategy = 'merge',
   tags = ['core', 'fungible_assets', 'usdt']
 ) }}
@@ -12,16 +12,20 @@ SELECT
     block_timestamp,
     block_timestamp::DATE AS block_date,
     block_number,
-    tx_hash,
+    {{ dbt_utils.generate_surrogate_key( ['tx_hash'] ) }} AS transactions_id,
     address AS store_address,
     change_data:metadata:inner::STRING AS metadata_address,
+    {{ dbt_utils.generate_surrogate_key( ['tx_hash'] ) }} AS transactions_id,
+    
     -- Flag USDT stores for easy filtering
     CASE 
       WHEN change_data:metadata:inner::STRING = '0x357b0b74bc833e95a115ad22604854d6b0fca151cecd94111770e5d6ffc9dc2b' 
       THEN TRUE 
       ELSE FALSE 
     END AS is_usdt,
-    _inserted_timestamp
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id
 FROM
     {{ ref('silver__changes') }}
 WHERE

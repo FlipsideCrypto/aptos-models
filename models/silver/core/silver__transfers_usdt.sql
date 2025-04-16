@@ -23,7 +23,9 @@ WITH events AS (
     -- Extract store address from event data if available, otherwise use account_address
     COALESCE(event_data :store :: STRING, account_address) AS account_address,
     creation_number,
-    _inserted_timestamp
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id
   FROM
     {{ ref('silver__events') }}
   WHERE
