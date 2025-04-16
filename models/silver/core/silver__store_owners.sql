@@ -7,26 +7,29 @@
 
 SELECT
   block_timestamp,
+  block_timestamp::DATE AS block_date,
   block_number,
-  version,
   tx_hash,
-  change_index,
-  change_data :owner :: STRING AS owner_address,
-  address store_address
+  address AS store_address,
+  change_data:owner::STRING AS owner_address,
+  _inserted_timestamp
 FROM
   {{ ref('silver__changes') }}
 WHERE
-  success
-  AND change_address = '0x1'
+  change_address = '0x1'
   AND change_module = 'object'
   AND change_resource = 'ObjectCore'
-  AND block_timestamp :: DATE > CURRENT_DATE - 14
-
-{% if is_incremental() %}
-AND _inserted_timestamp >= (
-  SELECT
-    MAX(_inserted_timestamp)
-  FROM
-    {{ this }}
-)
-{% endif %}
+  {% if is_incremental() %}
+  -- Use _inserted_timestamp for incremental logic
+  AND _inserted_timestamp >= (
+    SELECT
+      MAX(_inserted_timestamp)
+    FROM
+      {{ this }}
+  )
+  {% else %}
+  -- Use fixed date range for initial load
+  AND block_timestamp between '2025-02-20' and '2025-02-22'
+  {% endif %}
+QUALIFY 
+  ROW_NUMBER() OVER (PARTITION BY address ORDER BY block_number DESC) = 1
