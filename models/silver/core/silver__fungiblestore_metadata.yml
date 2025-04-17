@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: silver__fungiblestore_usdt
+  - name: silver__fungiblestore_metadata
     description: |
       Identifies and tracks fungible stores that contain USDT tokens.
       This model filters and processes fungible asset stores, specifically identifying those
@@ -9,23 +9,14 @@ models:
       The model processes data from the last 30 days and maintains incremental updates.
     
     columns:
-      - name: block_timestamp
-        description: Timestamp of the block when the store was created/updated
+      - name: block_timestamp_first
+        description: Block timestamp of the first time the store metadata was posted to the chain
         tests:
           - not_null
       
-      - name: block_date
-        description: Date of the block when the store was created/updated
-        tests:
-          - not_null
       
-      - name: block_number
-        description: Block number of the store creation/update
-        tests:
-          - not_null
-      
-      - name: tx_hash
-        description: Transaction hash of the store creation/update
+      - name: block_number_first
+        description: Block number of the first time the store metadata was posted to the chain
         tests:
           - not_null
       
@@ -47,7 +38,3 @@ models:
           - accepted_values:
               values: [true, false]
       
-      - name: _inserted_timestamp
-        description: Timestamp when the record was inserted into the table
-        tests:
-          - not_null 

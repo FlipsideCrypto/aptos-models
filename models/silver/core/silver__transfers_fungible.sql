@@ -7,22 +7,19 @@
   tags = ['core','full_test']
 ) }}
 
--- USDT Token Metadata Address: 0x357b0b74bc833e95a115ad22604854d6b0fca151cecd94111770e5d6ffc9dc2b
-
 WITH events AS (
+
   SELECT
     block_number,
     version,
     success,
     block_timestamp,
-    block_timestamp :: DATE AS block_date,
     tx_hash,
     event_index,
     event_resource,
     event_data :amount :: bigint AS amount,
-    -- Extract store address from event data if available, otherwise use account_address
-    COALESCE(event_data :store :: STRING, account_address) AS account_address,
-    creation_number,
+    account_address,
+    event_data :store :: STRING AS store_address,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
     '{{ invocation_id }}' AS _invocation_id
@@ -30,40 +27,38 @@ WITH events AS (
     {{ ref('silver__events') }}
   WHERE
     event_module = 'fungible_asset'
-    AND event_resource IN ('WithdrawEvent', 'DepositEvent', 'Withdraw', 'Deposit')
+    AND event_resource IN (
+      'WithdrawEvent',
+      'DepositEvent',
+      'Withdraw',
+      'Deposit'
+    )
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
   SELECT
-    MAX(_inserted_timestamp)
+    MAX(modified_timestamp)
   FROM
     {{ this }}
 )
 {% endif %}
 ),
-chnges AS (
+owners AS (
   SELECT
-    block_timestamp :: DATE AS block_date,
-    tx_hash,
-    change_index,
-    change_data:metadata:inner::string AS token_address
+    version,
+    block_timestamp,
+    store_address,
+    owner_address
   FROM
-    {{ ref('silver__changes') }}
-  WHERE
-    change_module = 'fungible_asset'
-    AND change_data:metadata:inner::string = '0x357b0b74bc833e95a115ad22604854d6b0fca151cecd94111770e5d6ffc9dc2b'
-
-{% if is_incremental() %}
-AND _inserted_timestamp >= (
+    {{ ref('silver__fungiblestore_owners') }}
+),
+md AS (
   SELECT
-    MAX(_inserted_timestamp)
+    store_address,
+    metadata_address
   FROM
-    {{ this }}
+    {{ ref('silver__fungiblestore_metadata') }}
 )
-{% endif %}
-qualify(ROW_NUMBER() over(PARTITION BY tx_hash ORDER BY change_index DESC) = 1)
-)
-
 SELECT
   e.block_number,
   e.block_timestamp,
@@ -74,8 +69,11 @@ SELECT
   e.creation_number,
   e.event_resource AS transfer_event,
   e.account_address,
+  e.store_address,
+  o.owner_address,
+  md.metadata_address,
   e.amount,
-  c.token_address,
+  C.token_address,
   {{ dbt_utils.generate_surrogate_key(
     ['e.tx_hash','e.event_index']
   ) }} AS transfers_id,
@@ -84,9 +82,10 @@ SELECT
   e._inserted_timestamp,
   '{{ invocation_id }}' AS _invocation_id
 FROM
-  events e
-  INNER JOIN chnges c
-  ON e.block_date = c.block_date
-  AND e.tx_hash = c.tx_hash
-WHERE 
-  e.event_resource IN ('DepositEvent', 'Deposit','WithdrawEvent', 'Withdraw')
+  events e asof
+  JOIN owners o match_condition(
+    e.version >= o.version
+  )
+  ON e.store_address = o.store_address
+  LEFT JOIN md m
+  ON e.store_address = m.store_address

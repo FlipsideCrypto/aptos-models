@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: silver__transfers_usdt
+  - name: silver__transfers_fungible
     tests:
       - dbt_constraints.primary_key:
           column_name: TRANSFERS_ID

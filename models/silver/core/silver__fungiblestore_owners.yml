@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: silver__store_owners
+  - name: silver__fungiblestore_owners
     description: |
       Tracks ownership of stores over time, capturing the latest owner for each store address.
       This model is primarily used for fungible asset tracking, including USDT.
