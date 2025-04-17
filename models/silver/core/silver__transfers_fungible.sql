@@ -18,7 +18,6 @@ WITH events AS (
     event_index,
     event_resource,
     event_data :amount :: bigint AS amount,
-    account_address,
     event_data :store :: STRING AS store_address,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
