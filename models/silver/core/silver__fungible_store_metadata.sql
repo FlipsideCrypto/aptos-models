@@ -2,7 +2,9 @@
   materialized = 'incremental',
   unique_key = ['store_address'],
   incremental_strategy = 'merge',
-  tags = ['core', 'fungible_assets', 'usdt']
+  tags = ['core', 'full_test', 'fungible_assets'],
+  cluster_by = ['block_timestamp::DATE','modified_timestamp::DATE'],
+  merge_exclude_columns = ["inserted_timestamp"],
 ) }}
 
 -- This model identifies fungible stores that contain USDT tokens
@@ -14,15 +16,8 @@ SELECT
     block_number,
     {{ dbt_utils.generate_surrogate_key( ['tx_hash'] ) }} AS transactions_id,
     address AS store_address,
+    change_index,
     change_data:metadata:inner::STRING AS metadata_address,
-    {{ dbt_utils.generate_surrogate_key( ['tx_hash'] ) }} AS transactions_id,
-    
-    -- Flag USDT stores for easy filtering
-    CASE 
-      WHEN change_data:metadata:inner::STRING = '0x357b0b74bc833e95a115ad22604854d6b0fca151cecd94111770e5d6ffc9dc2b' 
-      THEN TRUE 
-      ELSE FALSE 
-    END AS is_usdt,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
     '{{ invocation_id }}' AS _invocation_id
@@ -42,4 +37,3 @@ WHERE
     {% endif %}
 QUALIFY 
     ROW_NUMBER() OVER (PARTITION BY address ORDER BY block_number DESC) = 1
-    AND is_usdt = TRUE  -- Only include USDT stores

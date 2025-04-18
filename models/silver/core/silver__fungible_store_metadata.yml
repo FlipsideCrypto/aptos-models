@@ -1,25 +1,25 @@
 version: 2
 
 models:
-  - name: silver__store_owners
+  - name: silver__fungible_store_metadata
     description: |
-      Tracks ownership of fungible stores over time.
-      Each row represents a change in store ownership, with the latest owner for each store address at a given timestamp.
+      Identifies and tracks metadata for fungible stores.
+      Each row represents the latest metadata state for a fungible store.
       The model processes data from March 2025 and maintains incremental updates.
     
     columns:
       - name: block_timestamp
-        description: Timestamp of the block when the ownership change occurred
+        description: Timestamp of the block when the metadata was created/updated
         tests:
           - not_null
       
       - name: block_date
-        description: Date of the block when the ownership change occurred
+        description: Date of the block when the metadata was created/updated
         tests:
           - not_null
       
       - name: block_number
-        description: Block number of the ownership change
+        description: Block number when the metadata was created/updated
         tests:
           - not_null
       
@@ -29,23 +29,24 @@ models:
           - not_null
           - unique
       
+      - name: store_address
+        description: Address of the fungible store
+        tests:
+          - not_null
+          - unique
+      
       - name: change_index
         description: Index of the change within the transaction
         tests:
           - not_null
       
-      - name: store_address
-        description: Address of the fungible store
+      - name: metadata_address
+        description: Address of the metadata associated with the store
         tests:
           - not_null
       
-      - name: owner_address
-        description: Address of the store owner
-        tests:
-          - not_null
-      
-      - name: _inserted_timestamp
-        description: Timestamp when the record was first inserted
+      - name: inserted_timestamp
+        description: Timestamp of when this record was inserted (computed)
         tests:
           - not_null
       

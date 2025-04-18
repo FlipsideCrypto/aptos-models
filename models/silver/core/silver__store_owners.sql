@@ -2,18 +2,24 @@
   materialized = 'incremental',
   unique_key = ['tx_hash','change_index'],
   incremental_strategy = 'merge',
-  tags = ['core','full_test']
+  merge_exclude_columns = ["inserted_timestamp"],
+  tags = ['core','full_test','fungible_assets']
 ) }}
 
+
+-- This model tracks ownership of fungible stores over time
+-- Each row represents a change in store ownership
 SELECT
   block_timestamp,
   block_timestamp::DATE AS block_date,
   block_number,
-  tx_hash,
+  {{ dbt_utils.generate_surrogate_key( ['tx_hash'] ) }} AS transactions_id,
   change_index,
   address AS store_address,
   change_data:owner::STRING AS owner_address,
-  _inserted_timestamp
+  SYSDATE() AS inserted_timestamp,
+  SYSDATE() AS modified_timestamp,
+  '{{ invocation_id }}' AS _invocation_id
 FROM
   {{ ref('silver__changes') }}
 WHERE
@@ -30,4 +36,4 @@ WHERE
   )
   {% endif %}
 QUALIFY 
-  ROW_NUMBER() OVER (PARTITION BY address ORDER BY block_number DESC) = 1
+  ROW_NUMBER() OVER (PARTITION BY address, block_timestamp ORDER BY change_index DESC) = 1
