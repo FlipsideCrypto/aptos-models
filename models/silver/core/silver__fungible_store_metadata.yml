@@ -1,0 +1,61 @@
+version: 2
+
+models:
+  - name: silver__fungible_store_metadata
+    description: |
+      Identifies and tracks metadata for fungible stores.
+      Each row represents the latest metadata state for a fungible store.
+      The model processes data from March 2025 and maintains incremental updates.
+    
+    columns:
+      - name: block_timestamp
+        description: Timestamp of the block when the metadata was created/updated
+        tests:
+          - not_null
+      
+      - name: block_date
+        description: Date of the block when the metadata was created/updated
+        tests:
+          - not_null
+      
+      - name: block_number
+        description: Block number when the metadata was created/updated
+        tests:
+          - not_null
+      
+      - name: transactions_id
+        description: Unique identifier for the transaction (surrogate key)
+        tests:
+          - not_null
+          - unique
+      
+      - name: store_address
+        description: Address of the fungible store
+        tests:
+          - not_null
+          - unique
+      
+      - name: change_index
+        description: Index of the change within the transaction
+        tests:
+          - not_null
+      
+      - name: metadata_address
+        description: Address of the metadata associated with the store
+        tests:
+          - not_null
+      
+      - name: inserted_timestamp
+        description: Timestamp of when this record was inserted (computed)
+        tests:
+          - not_null
+      
+      - name: modified_timestamp
+        description: Timestamp of when this record was last modified
+        tests:
+          - not_null
+      
+      - name: _invocation_id
+        description: Unique identifier for the dbt run that inserted this record
+        tests:
+          - not_null 
