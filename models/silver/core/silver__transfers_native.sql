@@ -60,8 +60,7 @@ reg AS (
     tx_hash,
     version,
     success,
-    event_index,
-    _inserted_timestamp
+    event_index
   FROM
     {{ ref('silver__events') }}
   WHERE
