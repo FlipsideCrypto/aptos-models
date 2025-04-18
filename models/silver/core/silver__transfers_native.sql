@@ -92,6 +92,7 @@ SELECT
   ) }} AS transfers_native_id,
   SYSDATE() AS inserted_timestamp,
   SYSDATE() AS modified_timestamp,
+  wth._inserted_timestamp,
   '{{ invocation_id }}' AS _invocation_id
 FROM
   wth
