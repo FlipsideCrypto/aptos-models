@@ -124,8 +124,8 @@ parsed AS (
         sender AS swapper,
         event_data:idx_in :: INT AS idx_in,
         event_data:idx_out :: INT AS idx_out,
-        event_data:amount_in :: INT AS amount_in,
-        event_data:amount_out :: INT AS amount_out,
+        event_data:amount_in :: INT AS amount_in_unadj,
+        event_data:amount_out :: INT AS amount_out_unadj,
         event_data:metadata[event_data:idx_in :: INT]:inner :: STRING AS token_in,
         event_data:metadata[event_data:idx_out :: INT]:inner :: STRING AS token_out,
         modified_timestamp
@@ -145,8 +145,8 @@ SELECT
     swapper,
     token_in,
     token_out,
-    amount_in,
-    amount_out,
+    amount_in_unadj,
+    amount_out_unadj,
     {{ dbt_utils.generate_surrogate_key(
         ['tx_hash','event_index']
     ) }} AS dex_swaps_thala_v2_id,
