@@ -133,8 +133,8 @@ parsed AS (
     FROM
         joined
     WHERE
-        event_data:token_in IS NOT NULL
-        AND event_data:token_out IS NOT NULL
+        event_data:from_token:inner :: STRING IS NOT NULL
+        AND event_data:to_token:inner :: STRING IS NOT NULL
 
     QUALIFY ROW_NUMBER() OVER (
         PARTITION BY tx_hash, event_index
