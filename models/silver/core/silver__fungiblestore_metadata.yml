@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: silver__fungiblestore_metadata
+    description: |
+      Identifies and tracks fungible stores that contain USDT tokens.
+      This model filters and processes fungible asset stores, specifically identifying those
+      containing USDT tokens using the USDT metadata address.
+      The model processes data from the last 30 days and maintains incremental updates.
+    
+    columns:
+      - name: block_timestamp_first
+        description: Block timestamp of the first time the store metadata was posted to the chain
+        tests:
+          - not_null
+      
+      
+      - name: block_number_first
+        description: Block number of the first time the store metadata was posted to the chain
+        tests:
+          - not_null
+      
+      - name: store_address
+        description: Address of the fungible store
+        tests:
+          - not_null
+          - unique
+      
+      - name: metadata_address
+        description: Metadata address of the token in the store
+        tests:
+          - not_null
+      
+      - name: is_usdt
+        description: Flag indicating if the store contains USDT tokens
+        tests:
+          - not_null
+          - accepted_values:
+              values: [true, false]
+      
