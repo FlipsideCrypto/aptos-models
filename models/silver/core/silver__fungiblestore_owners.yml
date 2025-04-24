@@ -53,8 +53,4 @@ models:
         description: Timestamp of when this record was last modified
         tests:
           - not_null
-      
-      - name: _invocation_id
-        description: Unique identifier for the dbt run that inserted this record
-        tests:
-          - not_null 
+    

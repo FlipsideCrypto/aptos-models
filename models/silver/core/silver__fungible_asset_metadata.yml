@@ -1,0 +1,21 @@
+version: 2
+models:
+  - name: silver__fungible_asset_metadata
+
+    columns:
+      - name: token_address
+        tests:
+          - not_null
+          - unique
+      - name: decimals
+        tests:
+          - not_null  
+      - name: NAME
+        tests:
+          - not_null  
+      - name: symbol
+        tests:
+          - not_null  
+      
+     
+      
