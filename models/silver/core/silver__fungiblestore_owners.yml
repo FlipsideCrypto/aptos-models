@@ -5,25 +5,22 @@ models:
     description: |
       Tracks ownership of fungible stores over time.
       Each row represents a change in store ownership, with the latest owner for each store address at a given timestamp.
-      The model processes data from March 2025 and maintains incremental updates.
     
     columns:
       - name: block_timestamp
         description: Timestamp of the block when the ownership change occurred
         tests:
           - not_null
-      
-      - name: block_date
-        description: Date of the block when the ownership change occurred
-        tests:
-          - not_null
+          - dbt_expectations.expect_row_values_to_have_recent_data:
+              datepart: day
+              interval: 1
       
       - name: block_number
         description: Block number of the ownership change
         tests:
           - not_null
       
-      - name: transactions_id
+      - name: fungiblestore_owners_id
         description: Unique identifier for the transaction (surrogate key)
         tests:
           - not_null
@@ -41,11 +38,6 @@ models:
       
       - name: owner_address
         description: Address of the store owner
-        tests:
-          - not_null
-      
-      - name: _inserted_timestamp
-        description: Timestamp when the record was first inserted
         tests:
           - not_null
       

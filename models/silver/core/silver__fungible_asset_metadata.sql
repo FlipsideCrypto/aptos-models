@@ -8,10 +8,11 @@
 
 SELECT
     metadata_address AS token_address,
-    creator_address,
     symbol,
     NAME,
     decimals,
+    icon_uri,
+    project_uri,
     {{ dbt_utils.generate_surrogate_key(
         ['metadata_address']
     ) }} AS fungible_asset_metadata_id,
@@ -20,38 +21,21 @@ SELECT
     _inserted_timestamp,
     '{{ invocation_id }}' AS _invocation_id
 FROM
-    {{ ref('bronze_api__aptoslabs_fungible_asset_metadata_by_pk') }}
+    {{ ref('bronze_api__fungible_asset_metadata') }}
+WHERE
+    symbol IS NOT NULL
 
 {% if is_incremental() %}
-WHERE
-    _inserted_timestamp >= (
-        SELECT
-            MAX(
-                _inserted_timestamp
-            )
-        FROM
-            {{ this }}
-    )
+AND _inserted_timestamp >= (
+    SELECT
+        MAX(
+            _inserted_timestamp
+        )
+    FROM
+        {{ this }}
+)
 {% endif %}
 
 qualify(ROW_NUMBER() over(PARTITION BY metadata_address
 ORDER BY
     _inserted_timestamp DESC)) = 1
-
-{% if is_incremental() %}
-{% else %}
-    UNION ALL
-    SELECT
-        '0xa' AS token_address,
-        '0x0000000000000000000000000000000000000000000000000000000000000001' AS creator_address,
-        'APT' AS symbol,
-        'Aptos Coin' AS NAME,
-        8 AS decimals,
-        {{ dbt_utils.generate_surrogate_key(
-            ['token_address']
-        ) }} AS fungible_asset_metadata_id,
-        SYSDATE() AS inserted_timestamp,
-        SYSDATE() AS modified_timestamp,
-        '1900-01-01' AS _inserted_timestamp,
-        '{{ invocation_id }}' AS _invocation_id
-    {% endif %}
