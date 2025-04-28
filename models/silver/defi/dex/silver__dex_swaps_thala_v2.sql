@@ -3,7 +3,8 @@
     unique_key = "dex_swaps_thala_v2_id",
     incremental_strategy = 'merge',
     merge_exclude_columns = ["inserted_timestamp"],
-    cluster_by = ['modified_timestamp::DATE']
+    cluster_by = ['modified_timestamp::DATE'],
+    tags = ['noncore']
 ) }}
 
 {% if execute %}
@@ -87,7 +88,7 @@ events AS (
 {% if is_incremental() %}
 AND block_timestamp :: DATE >= '{{min_bd}}'
 {% endif %}
-), 
+),
 joined AS (
     SELECT
         tx.tx_hash,
@@ -100,17 +101,20 @@ joined AS (
         e.event_address,
         e.event_resource,
         e.event_data,
-        GREATEST(COALESCE(e.modified_timestamp,'2000-01-01'), COALESCE(tx.modified_timestamp,'2000-01-01')) as modified_timestamp
-    FROM 
+        GREATEST(COALESCE(e.modified_timestamp, '2000-01-01'), COALESCE(tx.modified_timestamp, '2000-01-01')) AS modified_timestamp
+    FROM
         tx
         JOIN events e USING(
-            tx_hash, block_timestamp
+            tx_hash,
+            block_timestamp
         )
+
 {% if is_incremental() %}
-WHERE GREATEST(
-    tx.modified_timestamp,
-    e.modified_timestamp
-) >= '{{max_mod}}'
+WHERE
+    GREATEST(
+        tx.modified_timestamp,
+        e.modified_timestamp
+    ) >= '{{max_mod}}'
 {% endif %}
 ),
 parsed AS (
@@ -122,18 +126,18 @@ parsed AS (
         event_index,
         event_address,
         sender AS swapper,
-        event_data:idx_in :: INT AS idx_in,
-        event_data:idx_out :: INT AS idx_out,
-        event_data:amount_in :: INT AS amount_in_unadj,
-        event_data:amount_out :: INT AS amount_out_unadj,
-        event_data:metadata[event_data:idx_in :: INT]:inner :: STRING AS token_in,
-        event_data:metadata[event_data:idx_out :: INT]:inner :: STRING AS token_out,
+        event_data :idx_in :: INT AS idx_in,
+        event_data :idx_out :: INT AS idx_out,
+        event_data :amount_in :: INT AS amount_in_unadj,
+        event_data :amount_out :: INT AS amount_out_unadj,
+        event_data :metadata [event_data:idx_in :: INT] :inner :: STRING AS token_in,
+        event_data :metadata [event_data:idx_out :: INT] :inner :: STRING AS token_out,
         modified_timestamp
     FROM
         joined
     WHERE
-        event_data:idx_in IS NOT NULL
-        AND event_data:idx_out IS NOT NULL
+        event_data :idx_in IS NOT NULL
+        AND event_data :idx_out IS NOT NULL
 )
 SELECT
     block_number,
