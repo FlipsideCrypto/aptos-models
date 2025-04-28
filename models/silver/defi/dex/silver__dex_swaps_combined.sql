@@ -16,8 +16,9 @@
     ('thala', ref('silver__dex_swaps_thala')),
     ('thala', ref('silver__dex_swaps_thala_v0')),
     ('tsunami', ref('silver__dex_swaps_tsunami')),
+    ('hyperfluid', ref('silver__dex_swaps_hyperfluid')),
     ('thala', ref('silver__dex_swaps_thala_v2'))
-
+  
 ]
  %}
      {# ,    ('aires', ref('silver__dex_swaps_aires')) #}
