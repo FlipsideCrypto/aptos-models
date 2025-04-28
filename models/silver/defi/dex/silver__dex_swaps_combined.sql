@@ -15,7 +15,8 @@
     ('sushi', ref('silver__dex_swaps_sushi')),
     ('thala', ref('silver__dex_swaps_thala')),
     ('thala', ref('silver__dex_swaps_thala_v0')),
-    ('tsunami', ref('silver__dex_swaps_tsunami'))
+    ('tsunami', ref('silver__dex_swaps_tsunami')),
+    ('thala', ref('silver__dex_swaps_thala_v2'))
 
 ]
  %}
