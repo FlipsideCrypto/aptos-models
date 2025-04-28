@@ -32,8 +32,6 @@ WITH events AS (
       'Withdraw',
       'Deposit'
     )
-    AND block_timestamp :: DATE BETWEEN '2025-04-10'
-    AND '2025-04-11'
 
 {% if is_incremental() %}
 AND modified_timestamp >= (
@@ -77,14 +75,13 @@ SELECT
       'Deposit'
     ) THEN 'Deposit'
   END AS transfer_event,
-  e.account_address,
   e.store_address,
   o.owner_address,
   m.metadata_address,
   e.amount,
   {{ dbt_utils.generate_surrogate_key(
     ['e.tx_hash','e.event_index']
-  ) }} AS transfers_id,
+  ) }} AS transfers_fungible_id,
   SYSDATE() AS inserted_timestamp,
   SYSDATE() AS modified_timestamp,
   '{{ invocation_id }}' AS _invocation_id
