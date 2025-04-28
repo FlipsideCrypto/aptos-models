@@ -132,9 +132,6 @@ parsed AS (
         modified_timestamp
     FROM
         joined
-    WHERE
-        event_data:from_token:inner :: STRING IS NOT NULL
-        AND event_data:to_token:inner :: STRING IS NOT NULL
 
     QUALIFY ROW_NUMBER() OVER (
         PARTITION BY tx_hash, event_index
