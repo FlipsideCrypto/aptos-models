@@ -40,6 +40,9 @@ sources:
       - name: transaction_batch
       - name: blocks_tx_v2
       - name: transaction_batch_v2
-
+  - name: aptos_silver
+    schema: silver
+    tables:
+      - name: bridge_mover_transfers
 
   
