@@ -100,7 +100,7 @@ joined AS (
         e.event_address,
         e.event_resource,
         e.event_data,
-        COALESCE(GREATEST(e.modified_timestamp, tx.modified_timestamp),  e.modified_timestamp, tx.modified_timestamp) as modified_timestamp
+        GREATEST(COALESCE(e.modified_timestamp,'2000-01-01'), COALESCE(tx.modified_timestamp,'2000-01-01')) as modified_timestamp
     FROM 
         tx
         JOIN events e USING(
