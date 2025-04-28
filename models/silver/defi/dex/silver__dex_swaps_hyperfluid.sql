@@ -3,7 +3,8 @@
     unique_key = "dex_swaps_hyperfluid_id",
     incremental_strategy = 'merge',
     merge_exclude_columns = ["inserted_timestamp"],
-    cluster_by = ['modified_timestamp::DATE']
+    cluster_by = ['modified_timestamp::DATE'],
+    tags = ['noncore']
 ) }}
 
 {% if execute %}
