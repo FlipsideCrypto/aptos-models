@@ -136,11 +136,11 @@ SELECT
     WHEN event_resource IN (
       'WithdrawEvent',
       'Withdraw'
-    ) THEN 'Withdraw'
+    ) THEN 'WithdrawEvent'
     WHEN event_resource IN (
       'DepositEvent',
       'Deposit'
-    ) THEN 'Deposit'
+    ) THEN 'DepositEvent'
   END AS transfer_event,
   e.store_address,
   COALESCE(

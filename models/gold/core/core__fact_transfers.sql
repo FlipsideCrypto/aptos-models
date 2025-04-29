@@ -20,13 +20,44 @@ SELECT
     account_address,
     amount,
     token_address,
+    FALSE AS is_fungible,
+    NULL :: STRING AS store_address,
     transfers_id AS fact_transfers_id,
-    inserted_timestamp,
-    modified_timestamp
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
 FROM
-    {{ ref(
-        'silver__transfers'
-    ) }}
+    {{ ref('silver__transfers') }}
+WHERE
+    amount <> 0
+
+{% if is_incremental() %}
+AND modified_timestamp >= (
+    SELECT
+        MAX(modified_timestamp)
+    FROM
+        {{ this }}
+)
+{% endif %}
+UNION ALL
+SELECT
+    block_number,
+    block_timestamp,
+    tx_hash,
+    version,
+    success,
+    event_index,
+    NULL AS creation_number,
+    transfer_event,
+    owner_address AS account_address,
+    amount,
+    metadata_address AS token_address,
+    TRUE AS is_fungible,
+    store_address,
+    transfers_fungible_id AS fact_transfers_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+FROM
+    {{ ref('silver__transfers_fungible') }}
 WHERE
     amount <> 0
 

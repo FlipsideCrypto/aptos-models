@@ -6,6 +6,9 @@ models:
     columns:
       - name: TOKEN_ADDRESS
         description: '{{ doc("token_address") }}'    
+        data_tests:
+          - not_null
+          - unique
       - name: NAME
         description: 'The full token name'   
       - name: SYMBOL

@@ -26,6 +26,8 @@ models:
         description: '{{ doc("amount") }}' 
       - name: TOKEN_ADDRESS
         description: '{{ doc("token_address") }}'      
+      - name: IS_FUNGIBLE
+        description: 'Boolean indicating if the transfer used the legacy coin transfer mechanism or the fungible_asset module'
       - name: FACT_TRANSFERS_ID
         description: '{{ doc("pk") }}' 
         tests:
