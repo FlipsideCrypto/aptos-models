@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: silver__fungiblestore_metadata
+    description: |
+      Identifies and tracks fungible stores metadata
+    
+    columns:
+      - name: block_timestamp_first
+        description: Block timestamp of the first time the store metadata was posted to the chain
+        tests:
+          - not_null
+          - dbt_expectations.expect_row_values_to_have_recent_data:
+              datepart: day
+              interval: 7
+      
+      
+      - name: block_number_first
+        description: Block number of the first time the store metadata was posted to the chain
+        tests:
+          - not_null
+      
+      - name: store_address
+        description: Address of the fungible store
+        tests:
+          - not_null
+          - unique
+      
+      - name: metadata_address
+        description: Metadata address of the token in the store
+        tests:
+          - not_null
+      
+      - name: is_usdt
+        description: Flag indicating if the store contains USDT tokens
+        tests:
+          - not_null
+          - accepted_values:
+              values: [true, false]
+      
