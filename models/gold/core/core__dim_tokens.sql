@@ -27,12 +27,13 @@ FROM
     ) }}
 
 {% if is_incremental() %}
-AND modified_timestamp >= (
-    SELECT
-        MAX(modified_timestamp)
-    FROM
-        {{ this }}
-)
+WHERE
+    modified_timestamp >= (
+        SELECT
+            MAX(modified_timestamp)
+        FROM
+            {{ this }}
+    )
 {% endif %}
 UNION ALL
 SELECT
@@ -53,10 +54,11 @@ FROM
     {{ ref('silver__fungible_asset_metadata') }}
 
 {% if is_incremental() %}
-AND modified_timestamp >= (
-    SELECT
-        MAX(modified_timestamp)
-    FROM
-        {{ this }}
-)
+WHERE
+    modified_timestamp >= (
+        SELECT
+            MAX(modified_timestamp)
+        FROM
+            {{ this }}
+    )
 {% endif %}
