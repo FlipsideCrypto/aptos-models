@@ -44,5 +44,5 @@ sources:
     schema: silver
     tables:
       - name: bridge_mover_transfers
-
+      - name: bridge_celer_transfers
   

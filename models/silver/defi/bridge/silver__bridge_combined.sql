@@ -4,7 +4,7 @@
 ) }}
 
 {% set models = [
-    ('a', ref('silver__bridge_celer_transfers')),
+    ('a', ref('silver__bridge_celer_transfers_view')),
     ('a', ref('silver__bridge_layerzero_transfers')),
     ('a', ref('silver__bridge_mover_transfers_view')),
     ('a', ref('silver__bridge_wormhole_transfers'))
