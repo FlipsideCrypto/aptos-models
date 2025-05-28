@@ -70,7 +70,7 @@ jobs:
           git push -f --set-upstream origin docs
 
   notify-failure:
-    needs: [run_dbt_jobs]
+    needs: [scheduled_run]
     if: failure()
     uses: ./.github/workflows/slack_notify.yml
     secrets:
