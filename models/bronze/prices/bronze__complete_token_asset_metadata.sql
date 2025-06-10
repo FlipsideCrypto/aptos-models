@@ -26,4 +26,4 @@ FROM
     ) }}
 WHERE
     blockchain ILIKE 'aptos'
-    AND token_address LIKE '%:%'
+    AND token_address ilike '0x%'

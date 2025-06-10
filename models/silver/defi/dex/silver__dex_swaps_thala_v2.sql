@@ -147,8 +147,14 @@ SELECT
     event_index,
     event_address,
     swapper,
-    token_in,
-    token_out,
+    CASE
+        WHEN token_in = '0xa' THEN '0x1::aptos_coin::AptosCoin'
+        ELSE token_in
+    END AS token_in,
+    CASE
+        WHEN token_out = '0xa' THEN '0x1::aptos_coin::AptosCoin'
+        ELSE token_out
+    END AS token_out,
     amount_in_unadj,
     amount_out_unadj,
     {{ dbt_utils.generate_surrogate_key(

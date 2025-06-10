@@ -58,7 +58,7 @@ WHERE
     (
         (
             p.blockchain = 'aptos'
-            AND p.token_address LIKE '%:%'
+            AND p.token_address ilike '0x%'
         )
         OR (
             p.blockchain = 'ethereum'

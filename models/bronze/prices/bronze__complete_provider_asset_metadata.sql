@@ -25,7 +25,7 @@ WHERE
     (
         (
             platform ILIKE 'aptos'
-            AND token_address LIKE '%:%'
+            AND token_address ilike '0x%'
         )
         OR (
             platform = 'ethereum'
