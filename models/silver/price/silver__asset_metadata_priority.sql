@@ -1,6 +1,6 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = ['token_address'],
+    unique_key = ['token_address_lower'],
     incremental_strategy = 'merge',
     merge_exclude_columns = ["inserted_timestamp"],
     tags = ['core']
@@ -53,6 +53,6 @@ WHERE
     )
 {% endif %}
 
-qualify(ROW_NUMBER() over (PARTITION BY token_address
+qualify(ROW_NUMBER() over (PARTITION BY token_address_lower
 ORDER BY
     priority ASC)) = 1
