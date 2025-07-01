@@ -28,6 +28,7 @@ SELECT
         C.name,
         m.name
     ) AS NAME,
+    p.is_verified,
     complete_token_prices_id AS hourly_prices_priority_id,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,

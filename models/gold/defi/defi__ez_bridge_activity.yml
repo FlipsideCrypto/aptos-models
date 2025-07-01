@@ -60,6 +60,8 @@ models:
               name: test_defi__destination_chain_name_not_null
       - name: TOKEN_ADDRESS
         description: '{{ doc("bridge_token_address") }}'
+      - name: TOKEN_IS_VERIFIED
+        description: '{{ doc("prices_is_verified") }}'
       - name: SYMBOL
         description: '{{ doc("symbol") }}'
       - name: AMOUNT_UNADJ
