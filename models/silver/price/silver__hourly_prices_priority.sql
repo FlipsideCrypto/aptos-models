@@ -58,8 +58,7 @@ FROM
 WHERE
     (
         (
-            p.blockchain = 'aptos'
-            AND p.token_address LIKE '%:%'
+            p.blockchain = 'aptos' {# AND p.token_address LIKE '%:%' #}
         )
         OR (
             p.blockchain = 'ethereum'

@@ -25,5 +25,4 @@ FROM
         'complete_token_asset_metadata'
     ) }}
 WHERE
-    blockchain ILIKE 'aptos'
-    AND token_address LIKE '%:%'
+    blockchain ILIKE 'aptos' {# AND token_address LIKE '%:%' #}
