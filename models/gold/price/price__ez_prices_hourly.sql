@@ -12,6 +12,10 @@ SELECT
     FALSE AS is_native,
     is_deprecated,
     is_imputed,
+    COALESCE(
+        is_verified,
+        FALSE
+    ) AS is_verified,
     inserted_timestamp,
     modified_timestamp,
     hourly_prices_priority_id AS ez_prices_hourly_id

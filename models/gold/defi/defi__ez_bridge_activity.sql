@@ -37,6 +37,10 @@ SELECT
         ) IS NOT NULL THEN amount_unadj / pow(10, COALESCE(t.decimals, p.decimals))
     END AS amount,
     amount * p.price AS amount_in_usd,
+    COALESCE(
+        is_verified,
+        FALSE
+    ) AS token_is_verified,
     event_index,
     fact_bridge_activity_id AS ez_bridge_activity_id,
     A.inserted_timestamp,

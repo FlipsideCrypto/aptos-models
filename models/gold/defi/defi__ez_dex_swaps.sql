@@ -20,10 +20,18 @@ SELECT
     swapper,
     token_in,
     COALESCE(
+        p_in.is_verified,
+        FALSE
+    ) AS token_in_is_verified,
+    COALESCE(
         t_in.symbol,
         p_in.symbol
     ) AS symbol_in,
     token_out,
+    COALESCE(
+        p_out.is_verified,
+        FALSE
+    ) AS token_out_is_verified,
     COALESCE(
         t_out.symbol,
         p_out.symbol

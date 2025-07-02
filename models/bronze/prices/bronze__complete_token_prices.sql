@@ -21,7 +21,8 @@ SELECT
     inserted_timestamp,
     modified_timestamp,
     complete_token_prices_id,
-    _invocation_id
+    _invocation_id,
+    is_verified
 FROM
     {{ source(
         'crosschain_silver',

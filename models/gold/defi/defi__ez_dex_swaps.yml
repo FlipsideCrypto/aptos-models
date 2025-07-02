@@ -69,6 +69,10 @@ models:
         description: '{{ doc("swap_platform") }}'
         tests:
           - not_null
+      - name: TOKEN_IN_IS_VERIFIED
+        description: '{{ doc("prices_is_verified") }}'
+      - name: TOKEN_OUT_IS_VERIFIED
+        description: '{{ doc("prices_is_verified") }}'
       - name: EZ_DEX_SWAPS_ID
         description: '{{ doc("pk") }}'   
       - name: INSERTED_TIMESTAMP
