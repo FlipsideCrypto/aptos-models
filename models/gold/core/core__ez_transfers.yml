@@ -1,0 +1,43 @@
+version: 2
+models:
+  - name: core__ez_transfers
+    description: '{{ doc("core__ez_transfers") }}'   
+
+    columns:
+      - name: BLOCK_NUMBER
+        description: '{{ doc("block_number") }}'  
+      - name: BLOCK_TIMESTAMP
+        description: '{{ doc("block_timestamp") }}'   
+      - name: TX_HASH
+        description: '{{ doc("tx_hash") }}'   
+      - name: VERSION
+        description: '{{ doc("version") }}'   
+      - name: SUCCESS
+        description: '{{ doc("success") }}'   
+      - name: EVENT_INDEX
+        description: '{{ doc("event_index") }}'   
+      - name: TRANSFER_EVENT
+        description: '{{ doc("transfer_event") }}'   
+      - name: ACCOUNT_ADDRESS
+        description: '{{ doc("address_event") }}'  
+      - name: AMOUNT_UNADJ
+        description: '{{ doc("amount_unadj") }}' 
+      - name: AMOUNT
+        description: '{{ doc("amount") }}' 
+      - name: AMOUNT_USD
+        description: '{{ doc("amount_usd") }}' 
+      - name: TOKEN_ADDRESS
+        description: '{{ doc("token_address") }}'      
+      - name: SYMBOL
+        description: '{{ doc("symbol") }}'
+      - name: TOKEN_IS_VERIFIED
+        description: '{{ doc("prices_is_verified") }}'
+      - name: EZ_TRANSFERS_ID
+        description: '{{ doc("pk") }}' 
+        tests:
+          - unique:
+              where: block_timestamp::Date > current_Date-3 
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'   
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}'   
