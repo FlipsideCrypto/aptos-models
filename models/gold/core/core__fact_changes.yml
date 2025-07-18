@@ -41,6 +41,7 @@ models:
       - name: VALUE 
         description: '{{ doc("value_change") }}'          
       - name: STATE_KEY_HASH
+        description: '{{ doc("state_key_hash") }}'
       - name: FACT_CHANGES_ID
         description: '{{ doc("pk") }}'   
       - name: INSERTED_TIMESTAMP

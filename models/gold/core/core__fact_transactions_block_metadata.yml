@@ -23,8 +23,11 @@ models:
       - name: CHANGES
         description: '{{ doc("changes") }}'   
       - name: FAILED_PROPOSER_INDICES
+        description: '{{ doc("failed_proposer_indices") }}'
       - name: ID
+        description: '{{ doc("id") }}'
       - name: PREVIOUS_BLOCK_VOTES_BITVEC
+        description: '{{ doc("previous_block_votes_bitvec") }}'
       - name: PROPOSER
         description: '{{ doc("proposer") }}'   
       - name: ROUND
@@ -32,6 +35,7 @@ models:
       - name: VM_STATUS 
         description: '{{ doc("vm_status") }}'   
       - name: STATE_CHANGE_HASH
+        description: '{{ doc("state_change_hash") }}'
       - name: ACCUMULATOR_ROOT_HASH
         description: '{{ doc("accumulator_root_hash") }}'  
       - name: EVENT_ROOT_HASH
