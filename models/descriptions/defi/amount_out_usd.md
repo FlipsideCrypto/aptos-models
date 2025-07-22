@@ -1,6 +1,15 @@
 {% docs amount_out_usd %}
 
-The US Dollar equivalent of a token of the outbound token for the swap. If the token's decimal is not available, this value will be NULL.
+The USD value of the outbound token amount, converted at the time of the swap.
 
+**Data type:** Decimal
+**Example:**
+- 1500.00 (for $1,500 worth of tokens)
+- 0.50 (for $0.50 worth of tokens)
+
+**Business Context:**
+- Used for financial analysis and reporting of swap volumes in USD terms.
+- Enables value-based analytics and aggregation of swap volumes in USD.
+- Supports dashboards and business intelligence for DEX platforms.
 
 {% enddocs %}

@@ -50,17 +50,17 @@ models:
         tests:
           - not_null
       - name: SYMBOL_IN
-        description: '{{ doc("token_out") }}'
+        description: '{{ doc("symbol_in") }}'
       - name: SYMBOL_OUT
-        description: '{{ doc("token_out") }}'
+        description: '{{ doc("symbol_out") }}'
       - name: AMOUNT_IN
-        description: '{{ doc("token_out") }}'
+        description: '{{ doc("amount_in") }}'
       - name: AMOUNT_OUT
-        description: '{{ doc("token_out") }}'
+        description: '{{ doc("amount_out") }}'
       - name: AMOUNT_IN_USD
-        description: '{{ doc("token_out") }}'
+        description: '{{ doc("amount_in_usd") }}'
       - name: AMOUNT_OUT_USD
-        description: '{{ doc("token_out") }}'
+        description: '{{ doc("amount_out_usd") }}'
       - name: SWAPPER
         description: '{{ doc("swapper") }}'
         tests:
