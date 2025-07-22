@@ -34,7 +34,8 @@ FROM
     LEFT JOIN core.dex_swaps__mod_intermediate_tmp b
     ON A.platform = b.platform
 WHERE
-    (
+    A.platform <> 'thala'
+    AND (
         A.modified_timestamp >= b.modified_timestamp
         OR b.modified_timestamp IS NULL
     ) {% endset %}
