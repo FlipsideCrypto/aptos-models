@@ -10,19 +10,19 @@ models:
           - not_null
           - unique
       - name: NAME
-        description: 'The full token name'   
+        description: '{{ doc("name") }}'   
       - name: SYMBOL
-        description: 'The token symbol'   
+        description: '{{ doc("symbol") }}'   
       - name: DECIMALS
-        description: 'The number of decimals for the token'   
+        description: '{{ doc("decimals") }}'   
       - name: COIN_TYPE_HASH
-        description: 'Hash of the coin type'   
+        description: '{{ doc("coin_type_hash") }}'   
       - name: CREATOR_ADDRESS
-        description: 'The account address that created the token'   
+        description: '{{ doc("creator_address") }}'   
       - name: TRANSACTION_CREATED_TIMESTAMP
-        description: 'The timestamp of when the token was created'   
+        description: '{{ doc("transaction_created_timestamp") }}'   
       - name: TRANSACTION_VERSION_CREATED
-        description: 'The transaction version of when the token was created'  
+        description: '{{ doc("transaction_version_created") }}'  
       - name: DIM_TOKENS_ID
         description: '{{ doc("pk") }}'   
       - name: INSERTED_TIMESTAMP

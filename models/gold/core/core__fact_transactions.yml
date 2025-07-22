@@ -39,6 +39,7 @@ models:
       - name: VM_STATUS 
         description: '{{ doc("vm_status") }}'   
       - name: STATE_CHANGE_HASH
+        description: '{{ doc("state_change_hash") }}'
       - name: ACCUMULATOR_ROOT_HASH
         description: '{{ doc("accumulator_root_hash") }}' 
       - name: EVENT_ROOT_HASH

@@ -1,5 +1,17 @@
 {% docs vm_status %}
 
-For failed transactions, this fields provides context to why the transaction failed. For successful transactions, this field will be set to `Executed successfully`.
+The execution status of a transaction as reported by the Aptos Virtual Machine (VM), providing success confirmation or failure details.
+
+**Data type:** String
+**Example:**
+- Executed successfully
+- OUT_OF_GAS
+- INSUFFICIENT_BALANCE
+- INVALID_ARGUMENT
+
+**Business Context:**
+- Essential for transaction success rate analysis and failure investigation.
+- Critical for debugging transaction issues and understanding failure patterns.
+- Enables user experience analysis and error pattern recognition.
 
 {% enddocs %}
