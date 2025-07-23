@@ -1,7 +1,7 @@
 version: 2
 models:
   - name: nft__fact_nft_mints
-    description: This table contains NFT mints events 
+    description: '{{ doc("nft__fact_nft_mints") }}'
     columns:
       - name: BLOCK_NUMBER
         description: '{{ doc("nft_block_number") }}'

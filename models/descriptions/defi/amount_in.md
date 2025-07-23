@@ -1,5 +1,15 @@
 {% docs amount_in %}
 
-The decimal adjusted amount of a token of the inbound token for the swap. If there token's decimal is not available, this value will be NULL.
+The decimal-adjusted amount of the inbound token for the swap.
+
+**Data type:** Decimal
+**Example:**
+- 1.5 (for 1.5 tokens)
+- 100.0 (for 100 tokens)
+
+**Business Context:**
+- Used for financial analysis, reporting, and user-friendly analytics.
+- Enables value-based calculations and cross-token comparisons.
+- Supports dashboards and business intelligence for DEX platforms.
 
 {% enddocs %}

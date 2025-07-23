@@ -1,7 +1,7 @@
 version: 2
 models:
   - name: nft__fact_nft_sales
-    description: This table contains NFT sale events from bluemove, mercato, okx, seashrine,souffl3,topaz, and wapal
+    description: '{{ doc("nft__fact_nft_sales") }}'
     columns:
       - name: BLOCK_NUMBER
         description: '{{ doc("nft_block_number") }}'

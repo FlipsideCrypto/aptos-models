@@ -1,5 +1,16 @@
-{% docs nft_aggregator_name%}
+{% docs nft_aggregator_name %}
 
-The name of the aggregator platform where the sale took place. If the sale did not take place via an aggregator platform, then the value will be null.
+The name of the NFT aggregator or routing service involved in the event, if applicable.
+
+**Data type:** String
+**Example:**
+- Gem
+- Genie
+- None
+
+**Business Context:**
+- Used for grouping and filtering NFT events by aggregator.
+- Enables aggregator-level analytics, trend analysis, and reporting.
+- Supports dashboards and user-facing NFT discovery tools.
 
 {% enddocs %}
