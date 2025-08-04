@@ -3,12 +3,10 @@
   unique_key = ['tx_hash','_transfer_key','block_timestamp::DATE'],
   incremental_strategy = 'merge',
   merge_exclude_columns = ["inserted_timestamp"],
-  cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE'],
-  post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(tx_hash, version, from_address, to_address);",
-  tags = ['core','full_test'],
-  enabled = false
+  cluster_by = ['block_timestamp::DATE'],
+  tags = ['core','full_test']
 ) }}
-
+{# post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(tx_hash, version, from_address, to_address);", #}
 WITH xfer AS (
 
   SELECT
@@ -19,20 +17,19 @@ WITH xfer AS (
     success,
     event_index,
     transfer_event,
-    account_address,
+    owner_address account_address,
     amount,
-    token_address,
-    _inserted_timestamp
+    metadata_address AS token_address
   FROM
-    {{ ref('silver__transfers') }}
+    {{ ref('silver__transfers_fungible') }}
   WHERE
     amount > 0
-    AND token_address = '0x1::aptos_coin::AptosCoin'
+    AND metadata_address = '0xa'
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
+AND modified_timestamp >= (
   SELECT
-    MAX(_inserted_timestamp)
+    MAX(modified_timestamp)
   FROM
     {{ this }}
 )
@@ -53,28 +50,6 @@ dep AS (
     xfer
   WHERE
     transfer_event = 'DepositEvent'
-),
-reg AS (
-  SELECT
-    block_number,
-    block_timestamp,
-    tx_hash,
-    version,
-    success,
-    event_index
-  FROM
-    {{ ref('silver__events') }}
-  WHERE
-    event_type = '0x1::account::CoinRegisterEvent'
-
-{% if is_incremental() %}
-AND _inserted_timestamp >= (
-  SELECT
-    MAX(_inserted_timestamp)
-  FROM
-    {{ this }}
-)
-{% endif %}
 )
 SELECT
   wth.block_number,
@@ -92,19 +67,12 @@ SELECT
   ) }} AS transfers_native_id,
   SYSDATE() AS inserted_timestamp,
   SYSDATE() AS modified_timestamp,
-  wth._inserted_timestamp,
   '{{ invocation_id }}' AS _invocation_id
 FROM
   wth
-  LEFT JOIN reg
-  ON wth.tx_hash = reg.tx_hash
-  AND wth.event_index + 1 = reg.event_index
   JOIN dep
   ON wth.tx_hash = dep.tx_hash
   AND wth.amount = dep.amount
+  AND wth.event_index + 1 = dep.event_index
 WHERE
   wth.account_address <> dep.account_address
-  AND (
-    wth.event_index + 1 = dep.event_index
-    OR reg.event_index + 1 = dep.event_index
-  )
