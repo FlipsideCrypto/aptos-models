@@ -13,7 +13,7 @@ SELECT
   transfer_event,
   account_address,
   amount,
-  token_inoken_address,
+  token_address,
   transfers_id,
   inserted_timestamp,
   modified_timestamp,
