@@ -23,7 +23,7 @@ models:
       - name: AMOUNT_UNADJ
         description: '{{ doc("amount_unadj") }}' 
       - name: AMOUNT
-        description: '{{ doc("amount") }}' 
+        description: '{{ doc("amount_adj") }}' 
       - name: AMOUNT_USD
         description: '{{ doc("amount_usd") }}' 
       - name: TOKEN_ADDRESS
