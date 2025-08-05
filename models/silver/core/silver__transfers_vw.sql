@@ -1,3 +1,7 @@
+-- Description: 
+-- This view exposes transfer event data from the silver.transfers table, including block and transaction metadata, 
+-- transfer details, and audit fields. It is intended for downstream consumption and simplifies access to transfer events.
+
 {{ config(
   materialized = 'view'
 ) }}

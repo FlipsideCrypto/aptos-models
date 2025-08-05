@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: test_silver__transfers_native_recent
+  - name: test_silver__transfers_fungible_recent
 
 
     columns:
@@ -22,15 +22,18 @@ models:
       - name: SUCCESS
         tests:
           - not_null
-      - name: FROM_ADDRESS
+      - name: EVENT_INDEX
         tests:
           - not_null
-      - name: TO_ADDRESS
+      - name: TRANSFER_EVENT
+        tests:
+          - not_null
+      - name: OWNER_ADDRESS
         tests:
           - not_null
       - name: AMOUNT
         tests:
           - not_null
-      - name: TOKEN_ADDRESS
+      - name: METADATA_ADDRESS
         tests:
           - not_null

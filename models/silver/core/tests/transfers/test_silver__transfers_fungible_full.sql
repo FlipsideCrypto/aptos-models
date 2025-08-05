@@ -1,12 +1,11 @@
 {{ config(
     materialized = 'view',
-    tags = ['full_test'],
-    enabled = false
+    tags = ['full_test']
 ) }}
 
 SELECT
     *
 FROM
     {{ ref(
-        'silver__transfers_native'
+        'silver__transfers_fungible'
     ) }}

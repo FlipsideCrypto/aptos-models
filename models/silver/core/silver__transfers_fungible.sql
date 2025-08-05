@@ -22,7 +22,10 @@
     event_index,
     event_resource,
     event_data :amount :: bigint AS amount,
-    event_data :store :: STRING AS store_address
+    COALESCE(
+      event_data :store :: STRING,
+      account_address
+    ) AS store_address
   FROM
     {{ ref('silver__events') }}
   WHERE
