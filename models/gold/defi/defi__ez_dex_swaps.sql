@@ -114,7 +114,7 @@ WHERE
             p_out.modified_timestamp,
             '2000-01-01'
         )
-    ) >= LEAST(
+    ) >= GREATEST(
         (
             SELECT
                 MAX(
