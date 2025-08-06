@@ -7,8 +7,30 @@
     tags = ['noncore']
 ) }}
 
-WITH evnts AS (
+{% if execute %}
 
+{% if is_incremental() %}
+{% set min_bts_query %}
+
+SELECT
+    MIN(block_timestamp) :: DATE
+FROM
+    {{ ref('silver__events') }}
+WHERE
+    _inserted_timestamp > (
+        SELECT
+            MAX(_inserted_timestamp) modified_timestamp
+        FROM
+            {{ this }}
+    ) {% endset %}
+    {% set min_bts = run_query(min_bts_query) [0] [0] %}
+    {% if not min_bts or min_bts == 'None' %}
+        {% set min_bts = '2099-01-01' %}
+    {% endif %}
+{% endif %}
+{% endif %}
+
+WITH evnts AS (
     SELECT
         block_number,
         block_timestamp,
@@ -101,12 +123,7 @@ WHERE
     success
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
-    SELECT
-        MAX(_inserted_timestamp)
-    FROM
-        {{ this }}
-)
+AND block_timestamp :: DATE >= '{{ min_bts }}'
 {% endif %}
 ),
 v2_mint_events_raw AS (

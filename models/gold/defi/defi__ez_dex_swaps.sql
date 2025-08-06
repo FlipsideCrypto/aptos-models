@@ -114,12 +114,15 @@ WHERE
             p_out.modified_timestamp,
             '2000-01-01'
         )
-    ) >= (
-        SELECT
-            MAX(
-                modified_timestamp
-            )
-        FROM
-            {{ this }}
+    ) >= LEAST(
+        (
+            SELECT
+                MAX(
+                    modified_timestamp
+                )
+            FROM
+                {{ this }}
+        ),
+        SYSDATE() :: DATE - 7
     )
 {% endif %}

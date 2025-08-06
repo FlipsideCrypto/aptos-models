@@ -7,9 +7,31 @@
     post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(tx_hash, version, buyer_address, seller_address, nft_address);",
     tags = ['noncore']
 ) }}
+-- depends_on: {{ ref('silver__events') }}
+{% if execute %}
+
+{% if is_incremental() %}
+{% set min_bts_query %}
+
+SELECT
+    MIN(block_timestamp) :: DATE
+FROM
+    {{ ref('silver__events') }}
+WHERE
+    _inserted_timestamp > (
+        SELECT
+            MAX(_inserted_timestamp) _inserted_timestamp
+        FROM
+            {{ ref('silver__nft_sales_combined_view') }}
+    ) {% endset %}
+    {% set min_bts = run_query(min_bts_query) [0] [0] %}
+    {% if not min_bts or min_bts == 'None' %}
+        {% set min_bts = '2099-01-01' %}
+    {% endif %}
+{% endif %}
+{% endif %}
 
 WITH all_nft_platform_sales AS (
-
     SELECT
         *
     FROM
@@ -76,12 +98,7 @@ WHERE
     success
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
-    SELECT
-        MAX(_inserted_timestamp)
-    FROM
-        {{ this }}
-)
+AND block_timestamp :: DATE >= '{{ min_bts }}'
 {% endif %}
 ),
 aggregator_nft_sales AS (
