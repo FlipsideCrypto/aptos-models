@@ -4,7 +4,7 @@
     incremental_strategy = 'merge',
     merge_exclude_columns = ["inserted_timestamp"],
     cluster_by = ['modified_timestamp::DATE'],
-    tags = ['noncore']
+    tags = ['noncore_retired']
 ) }}
 
 WITH tx AS (
@@ -56,7 +56,7 @@ xfers AS (
         token_address,
         transfer_event
     FROM
-        {{ ref('silver__transfers') }}
+        {{ ref('silver__transfers_vw') }}
     WHERE
         success
         AND block_timestamp :: DATE <= '2023-04-05'

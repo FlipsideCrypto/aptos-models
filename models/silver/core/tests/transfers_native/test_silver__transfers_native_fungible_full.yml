@@ -1,12 +1,12 @@
 version: 2
 models:
-  - name: test_silver__transfers_full
+  - name: test_silver__transfers_native_fungible_full
 
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - TX_HASH
-            - EVENT_INDEX
+            - _TRANSFER_KEY
 
     columns:
       - name: BLOCK_NUMBER
@@ -48,34 +48,20 @@ models:
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - BOOLEAN
-      - name: EVENT_INDEX
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - NUMBER
-                - FLOAT
-      - name: CREATION_NUMBER
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - NUMBER
-                - FLOAT
-      - name: TRANSFER_EVENT
+      - name: FROM_ADDRESS
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - STRING
                 - VARCHAR
-      - name: ACCOUNT_ADDRESS
+      - name: TO_ADDRESS
         tests:
           - not_null
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - STRING
-                - VARCHAR
+                - VARCHAR                
       - name: AMOUNT
         tests:
           - not_null
@@ -90,7 +76,7 @@ models:
               column_type_list:
                 - STRING
                 - VARCHAR
-      - name: TRANSFERS_ID
+      - name: TRANSFERS_NATIVE_ID
         tests:
           - not_null
       - name: INSERTED_TIMESTAMP
@@ -99,11 +85,8 @@ models:
       - name: MODIFIED_TIMESTAMP
         tests:
           - not_null
-      - name: _INSERTED_TIMESTAMP
-        tests:
-          - name: not_null_test_silver__transfers_INSERTED_TIMESTAMP_
-            test_name: not_null
+
       - name: _INVOCATION_ID
         tests:
-          - name: not_null_test_silver__transfers_INVOCATION_ID
+          - name: not_null_test_silver__transfers_native_INVOCATION_ID
             test_name: not_null

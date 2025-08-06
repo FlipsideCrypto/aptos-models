@@ -7,5 +7,5 @@ SELECT
     *
 FROM
     {{ ref(
-        'silver__transfers_native'
+        'silver__transfers_native_fungible'
     ) }}

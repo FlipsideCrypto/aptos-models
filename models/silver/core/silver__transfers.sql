@@ -4,7 +4,8 @@
   incremental_strategy = 'merge',
   merge_exclude_columns = ["inserted_timestamp"],
   cluster_by = ['block_timestamp::DATE','modified_timestamp::DATE'],
-  tags = ['core','full_test']
+  tags = ['core','full_test'],
+  enabled = false
 ) }}
 
 WITH events AS (

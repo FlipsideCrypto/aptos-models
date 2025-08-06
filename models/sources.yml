@@ -25,6 +25,11 @@ sources:
     schema: bronze
     tables:
       - name: lq_blocks_txs
+  - name: silver
+    schema: silver
+    tables:
+      - name: transfers
+      - name: transfers_native
   - name: github_actions
     database: aptos
     schema: github_actions

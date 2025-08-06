@@ -26,7 +26,7 @@ SELECT
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
 FROM
-    {{ ref('silver__transfers') }}
+    {{ ref('silver__transfers_vw') }}
 WHERE
     amount <> 0
 

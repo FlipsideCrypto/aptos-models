@@ -46,9 +46,27 @@ xfers AS (
         event_index,
         token_address
     FROM
-        {{ ref('silver__transfers') }}
+        {{ ref('silver__transfers_vw') }}
     WHERE
         success
+
+{% if is_incremental() %}
+AND _inserted_timestamp >= (
+    SELECT
+        MAX(_inserted_timestamp)
+    FROM
+        {{ this }}
+)
+{% endif %}
+UNION ALL
+SELECT
+    tx_hash,
+    event_index,
+    metadata_address AS token_address
+FROM
+    {{ ref('silver__transfers_fungible') }}
+WHERE
+    success
 
 {% if is_incremental() %}
 AND _inserted_timestamp >= (

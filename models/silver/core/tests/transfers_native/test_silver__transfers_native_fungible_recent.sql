@@ -17,7 +17,7 @@ WITH last_3_days AS (
 SELECT
     *
 FROM
-    {{ ref('silver__transfers_native') }}
+    {{ ref('silver__transfers_native_fungible') }}
 WHERE
     block_number >= (
         SELECT
