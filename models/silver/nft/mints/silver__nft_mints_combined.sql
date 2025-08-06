@@ -8,8 +8,30 @@
     tags = ['noncore']
 ) }}
 
-WITH base AS (
+{% if execute %}
 
+{% if is_incremental() %}
+{% set min_bts_query %}
+
+SELECT
+    MIN(block_timestamp) :: DATE
+FROM
+    {{ ref('silver__nft_mints_v2') }}
+WHERE
+    _inserted_timestamp > (
+        SELECT
+            MAX(_inserted_timestamp) modified_timestamp
+        FROM
+            {{ this }}
+    ) {% endset %}
+    {% set min_bts = run_query(min_bts_query) [0] [0] %}
+    {% if not min_bts or min_bts == 'None' %}
+        {% set min_bts = '2099-01-01' %}
+    {% endif %}
+{% endif %}
+{% endif %}
+
+WITH base AS (
     SELECT
         *
     FROM
@@ -69,12 +91,7 @@ WHERE
     success
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
-    SELECT
-        MAX(_inserted_timestamp)
-    FROM
-        {{ this }}
-)
+AND block_timestamp :: DATE >= '{{ min_bts }}'
 {% endif %}
 )
 SELECT
