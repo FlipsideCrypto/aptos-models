@@ -54,9 +54,11 @@ events AS (
             '0x576410486a2da45eee6c949c995670112ddf2fbeedab20350d506328eefc9d4f::transfer_tokens::transfer_tokens_with_payload_entry',
             '0x576410486a2da45eee6c949c995670112ddf2fbeedab20350d506328eefc9d4f::complete_transfer::submit_vaa_and_register_entry'
         )
-        AND event_type IN (
-            '0x1::coin::DepositEvent',
-            '0x1::coin::WithdrawEvent'
+        AND event_resource IN (
+            'WithdrawEvent',
+            'DepositEvent',
+            'Withdraw',
+            'Deposit'
         )
 
 {% if is_incremental() %}
