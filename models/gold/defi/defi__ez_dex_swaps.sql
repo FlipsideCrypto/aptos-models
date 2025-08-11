@@ -123,6 +123,6 @@ WHERE
             FROM
                 {{ this }}
         ),
-        SYSDATE() :: DATE - 7
+        SYSDATE() :: DATE - 3
     )
 {% endif %}

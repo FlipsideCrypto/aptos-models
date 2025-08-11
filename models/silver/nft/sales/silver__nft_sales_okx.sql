@@ -42,13 +42,15 @@ WITH evnts AS (
         AND success
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
-    SELECT
-        MAX(_inserted_timestamp)
-    FROM
-        {{ this }}
+AND _inserted_timestamp >= GREATEST(
+    (
+        SELECT
+            MAX(_inserted_timestamp)
+        FROM
+            {{ this }}
+    ),
+    SYSDATE() :: DATE - 3
 )
-AND _inserted_timestamp >= CURRENT_DATE -3
 {% endif %}
 ),
 evnts_2 AS (

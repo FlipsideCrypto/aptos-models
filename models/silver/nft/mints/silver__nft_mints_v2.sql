@@ -17,11 +17,14 @@ SELECT
 FROM
     {{ ref('silver__events') }}
 WHERE
-    _inserted_timestamp > (
-        SELECT
-            MAX(_inserted_timestamp) modified_timestamp
-        FROM
-            {{ this }}
+    _inserted_timestamp > GREATEST(
+        (
+            SELECT
+                MAX(_inserted_timestamp)
+            FROM
+                {{ this }}
+        ),
+        SYSDATE() :: DATE - 3
     ) {% endset %}
     {% set min_bts = run_query(min_bts_query) [0] [0] %}
     {% if not min_bts or min_bts == 'None' %}
@@ -55,11 +58,14 @@ WITH evnts AS (
         )
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
-    SELECT
-        MAX(_inserted_timestamp)
-    FROM
-        {{ this }}
+AND _inserted_timestamp >= GREATEST(
+    (
+        SELECT
+            MAX(_inserted_timestamp)
+        FROM
+            {{ this }}
+    ),
+    SYSDATE() :: DATE - 3
 )
 {% endif %}
 ),
@@ -84,11 +90,14 @@ chngs AS (
         )
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
-    SELECT
-        MAX(_inserted_timestamp)
-    FROM
-        {{ this }}
+AND _inserted_timestamp >= GREATEST(
+    (
+        SELECT
+            MAX(_inserted_timestamp)
+        FROM
+            {{ this }}
+    ),
+    SYSDATE() :: DATE - 3
 )
 {% endif %}
 ),
@@ -104,11 +113,14 @@ xfers AS (
         success
 
 {% if is_incremental() %}
-AND _inserted_timestamp >= (
-    SELECT
-        MAX(_inserted_timestamp)
-    FROM
-        {{ this }}
+AND _inserted_timestamp >= GREATEST(
+    (
+        SELECT
+            MAX(_inserted_timestamp)
+        FROM
+            {{ this }}
+    ),
+    SYSDATE() :: DATE - 3
 )
 {% endif %}
 UNION ALL
