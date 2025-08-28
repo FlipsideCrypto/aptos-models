@@ -3,7 +3,7 @@ models:
   - name: silver__transfers_fungible
     tests:
       - dbt_constraints.primary_key:
-          column_name: TRANSFERS_ID
+          column_name: TRANSFERS_FUNGIBLE_ID
 
     columns:
       - name: BLOCK_NUMBER
@@ -27,13 +27,17 @@ models:
       - name: TRANSFER_EVENT
         tests:
           - not_null
-      - name: ACCOUNT_ADDRESS
+      - name: STORE_ADDRESS
         tests:
           - not_null
+      - name: OWNER_ADDRESS
+        tests:
+          - not_null
+      - name: METADATA_ADDRESS
       - name: AMOUNT
         tests:
           - not_null
-      - name: transfers_fungible_id
+      - name: TRANSFERS_FUNGIBLE_ID
         tests:
           - not_null
       - name: INSERTED_TIMESTAMP
@@ -44,5 +48,4 @@ models:
           - not_null
       - name: _INVOCATION_ID
         tests:
-          - name: not_null_silver__transfers_usdt_INVOCATION_ID
-            test_name: not_null 
+          - not_null 
