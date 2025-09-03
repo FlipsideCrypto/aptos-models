@@ -93,7 +93,7 @@ SELECT
     a.tx_hash,
     a.event_index,
     a.event_address,
-    a.withdrawer,
+    a.depositor,
     a.token_address,
     b.symbol as token_symbol,
     COALESCE(
