@@ -3,7 +3,7 @@
     unique_key = "lending_echo_repayments_id",
     incremental_strategy = 'merge',
     merge_exclude_columns = ["inserted_timestamp"],
-    cluster_by = ['block_timestamp::DATE', '_inserted_timestamp::DATE'],
+    cluster_by = ['modified_timestamp::DATE'],
     tags = ['noncore']
 ) }}
 
@@ -26,7 +26,7 @@ WITH events AS (
         event_data:amount::number AS amount,
         event_data:reserve::string AS lending_market,  -- reserve is the market
         _inserted_timestamp
-    FROM aptos.silver.events
+    FROM {{ ref('silver__events') }}
     WHERE event_address = '0xeab7ea4d635b6b6add79d5045c4a45d8148d88287b1cfa1c3b6a4b56f46839ed'
         AND event_module = 'borrow_logic' 
         AND event_resource = 'Repay'
