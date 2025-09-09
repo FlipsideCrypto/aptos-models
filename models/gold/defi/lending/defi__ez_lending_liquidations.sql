@@ -67,6 +67,29 @@ FROM
 WHERE
     modified_timestamp >= '{{ max_modified_timestamp }}'
 {% endif %}
+    UNION ALL
+SELECT 
+    'aries' as platform,
+    'aries' as protocol,
+    'v1' as protocol_version,
+    block_number,
+    block_timestamp,
+    version,
+    tx_hash,
+    event_index,
+    event_address,
+    liquidator,
+    borrower,
+    amount as amount_raw,
+    collateral_token,
+    debt_token,
+    lending_aries_liquidations_id as ez_lending_liquidations_id
+FROM
+    {{ ref('silver__lending_aries_liquidations') }} a
+    {% if is_incremental() %}
+WHERE
+    modified_timestamp >= '{{ max_modified_timestamp }}'
+{% endif %}
 ),
 prices AS (
     SELECT
