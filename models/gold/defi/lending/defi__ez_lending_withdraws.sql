@@ -63,6 +63,27 @@ FROM
 WHERE
     modified_timestamp >= '{{ max_modified_timestamp }}'
 {% endif %}
+    UNION ALL
+SELECT 
+    'aries' as platform,
+    'aries' as protocol,
+    'v1' as protocol_version,
+    block_number,
+    block_timestamp,
+    version,
+    tx_hash,
+    event_index,
+    event_address,
+    depositor,
+    token_address,
+    amount as amount_raw,
+    lending_aries_withdraws_id as ez_lending_withdraws_id
+FROM
+    {{ ref('silver__lending_aries_withdraws') }} a
+    {% if is_incremental() %}
+WHERE
+    modified_timestamp >= '{{ max_modified_timestamp }}'
+{% endif %}
 ),
 prices AS (
     SELECT

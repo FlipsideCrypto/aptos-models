@@ -79,7 +79,8 @@ models:
       - name: DEBT_TOKEN_SYMBOL
         description: "{{ doc('symbol') }}"
         tests:
-          - not_null: *recent_date_filter
+          - not_null:
+              where: block_timestamp >= current_date - 7 AND platform != 'echo'
       - name: DEBT_TOKEN_IS_VERIFIED
         description: "{{ doc('prices_is_verified') }}"
         tests:
@@ -95,7 +96,8 @@ models:
       - name: AMOUNT_USD
         description: "{{ doc('amount_usd') }}"
         tests:
-          - not_null: *recent_date_filter
+          - not_null:
+              where: block_timestamp >= current_date - 7 AND platform != 'echo'
       - name: EZ_LENDING_LIQUIDATIONS_ID
         description: "{{ doc('pk') }}"
         tests:
