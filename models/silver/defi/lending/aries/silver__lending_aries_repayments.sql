@@ -79,7 +79,8 @@ SELECT
     e._inserted_timestamp,
     {{ dbt_utils.generate_surrogate_key(['e.tx_hash', 'e.event_index']) }} AS lending_aries_repayments_id,
     SYSDATE() AS inserted_timestamp,
-    SYSDATE() AS modified_timestamp
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id
 FROM events e
 LEFT JOIN tx_sender t
     ON e.tx_hash = t.tx_hash
