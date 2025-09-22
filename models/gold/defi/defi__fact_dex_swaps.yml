@@ -12,7 +12,7 @@ models:
               datepart: day
               interval: 1
               group_by_columns: [Platform]
-              where: "PLATFORM <> 'tsunami'"
+              where: "PLATFORM not in ('tsunami', 'hippo')"
     columns:
       - name: BLOCK_NUMBER
         description: '{{ doc("block_number") }}'  
