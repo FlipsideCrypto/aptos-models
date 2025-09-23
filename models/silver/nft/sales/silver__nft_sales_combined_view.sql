@@ -3,7 +3,16 @@
     tags = ['noncore']
 ) }}
 
-{% set models = [ ('a',ref('silver__nft_sales_bluemove')),('a',ref('silver__nft_sales_bluemove_v2')),('a',ref('silver__nft_sales_mercato')),('a',ref('silver__nft_sales_okx')),('a',ref('silver__nft_sales_seashrine')),('a',ref('silver__nft_sales_souffl3')),('a',ref('silver__nft_sales_topaz')),('a',ref('silver__nft_sales_wapal'))] %}
+{% set models = [ 
+    ('a',ref('silver__nft_sales_bluemove_view')),
+    ('a',ref('silver__nft_sales_bluemove_v2')),
+    ('a',ref('silver__nft_sales_mercato')),
+    ('a',ref('silver__nft_sales_okx_view')),
+    ('a',ref('silver__nft_sales_seashrine_view')),
+    ('a',ref('silver__nft_sales_souffl3_view')),
+    ('a',ref('silver__nft_sales_topaz_view')),
+    ('a',ref('silver__nft_sales_wapal'))
+] %}
 
 SELECT
     block_timestamp,
