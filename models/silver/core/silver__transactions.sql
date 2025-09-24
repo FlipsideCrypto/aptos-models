@@ -9,7 +9,6 @@
   tags = ['core','full_test']
 ) }}
 -- depends_on: {{ ref('bronze__streamline_blocks_tx') }}
--- depends_on: {{ ref('bronze__streamline_transactions') }}
 -- depends_on: {{ ref('bronze__streamline_transaction_batch') }}
 {% if execute %}
   {% set max_inserted_query %}
