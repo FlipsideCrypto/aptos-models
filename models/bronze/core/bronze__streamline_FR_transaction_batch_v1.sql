@@ -1,6 +1,6 @@
 {{ config (
     materialized = 'view',
-    tags = ['core']
+    enabled = false,
 ) }}
 {{ streamline_external_table_FR_query(
     model = "transaction_batch",
