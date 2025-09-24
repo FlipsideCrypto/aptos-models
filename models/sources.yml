@@ -50,4 +50,9 @@ sources:
     tables:
       - name: bridge_mover_transfers
       - name: bridge_celer_transfers
+      - name: nft_sales_bluemove
+      - name: nft_sales_okx
+      - name: nft_sales_seashrine
+      - name: nft_sales_souffl3
+      - name: nft_sales_topaz
   

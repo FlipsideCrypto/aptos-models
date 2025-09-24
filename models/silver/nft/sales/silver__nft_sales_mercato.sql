@@ -46,6 +46,11 @@ WITH evnts AS (
                 event_resource = 'DepositEvent'
                 AND event_module = 'coin'
             )
+            OR (
+                event_resource = 'Deposit' 
+                and event_module = 'fungible_asset'
+                and event_data:store::string = '0xbd29051e8eac1ade043a2f9fe1d54be3fe5e706494ca6e2456f12921741c95d7'
+            )
         )
         AND success
 
@@ -57,7 +62,12 @@ AND _inserted_timestamp >= GREATEST(
         FROM
             {{ this }}
     ),
-    SYSDATE() :: DATE - 3
+    (
+        SELECT
+            MAX(_inserted_timestamp)
+        FROM
+            {{ this }}
+    )
 )
 {% endif %}
 ),
@@ -397,8 +407,9 @@ deposit_events_mercator AS (
         ) b
         ON A.tx_hash = b.tx_hash
     WHERE
-        event_resource = 'DepositEvent'
-        AND event_module = 'coin'
+        (event_resource = 'DepositEvent'
+        AND event_module = 'coin')
+        or (event_resource = 'Deposit' and event_module = 'fungible_asset')
 ),
 main_with_creator_fees_raw AS (
     SELECT
@@ -480,7 +491,8 @@ FROM
     AND platform.account_address IN (
         '0x6a03eb973cd9385d62fc2842d02a4dd6b70e52f5da77a0689e57e48d93fae1b4',
         '0x41699a1297fba9645eae628d909966659d2da5a425911c3d7bccd54ffce6606a',
-        '0xe11c12ec495f3989c35e1c6a0af414451223305b579291fc8f3d9d0575a23c26'
+        '0xe11c12ec495f3989c35e1c6a0af414451223305b579291fc8f3d9d0575a23c26',
+        '0x0'
     ) qualify ROW_NUMBER() over (
         PARTITION BY main.tx_hash,
         main.event_index
