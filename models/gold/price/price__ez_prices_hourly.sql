@@ -9,7 +9,10 @@ SELECT
     NAME,
     decimals,
     price,
-    FALSE AS is_native,
+    CASE 
+        WHEN LOWER(token_address) = LOWER('0x1::aptos_coin::AptosCoin') THEN TRUE
+        ELSE FALSE
+    END AS is_native,
     is_deprecated,
     is_imputed,
     COALESCE(
