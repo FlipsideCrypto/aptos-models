@@ -10,14 +10,7 @@ SELECT
     decimals,
     price,
     CASE 
-        WHEN LOWER(token_address) = LOWER('0x1::aptos_coin::AptosCoin') THEN TRUE
-        WHEN LOWER(token_address) = LOWER('0xa') 
-            AND NOT EXISTS (
-                SELECT 1 
-                FROM {{ ref('silver__hourly_prices_priority') }} aptos_coin
-                WHERE aptos_coin.hour = hourly_prices_priority.hour
-                AND LOWER(aptos_coin.token_address) = LOWER('0x1::aptos_coin::AptosCoin')
-            ) THEN TRUE
+        WHEN LOWER(token_address) = LOWER('0xa') THEN TRUE
         ELSE FALSE
     END AS is_native,
     is_deprecated,
