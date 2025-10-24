@@ -4,7 +4,9 @@
     incremental_strategy = 'merge',
     cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE'],
     merge_exclude_columns = ["inserted_timestamp"],
-    tags = ['noncore']
+    full_refresh = false,
+    enabled = false,
+
 ) }}
 
 WITH evnts AS (
