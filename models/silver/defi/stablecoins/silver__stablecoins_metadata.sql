@@ -114,9 +114,12 @@ SELECT
     SYSDATE() AS modified_timestamp,
     '{{ invocation_id }}' AS _invocation_id
 FROM enriched_stablecoins
-WHERE decimals IS NOT NULL
 
 {% if is_incremental() %}
+WHERE modified_timestamp >= (
+    SELECT MAX(modified_timestamp)
+    FROM {{ this }}
+)
 QUALIFY ROW_NUMBER() OVER (
     PARTITION BY token_address
     ORDER BY COALESCE(crosschain_modified_timestamp, metadata_modified_timestamp) DESC
