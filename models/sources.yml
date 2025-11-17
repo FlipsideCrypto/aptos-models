@@ -20,6 +20,7 @@ sources:
       - name: complete_provider_prices
       - name: complete_native_asset_metadata
       - name: complete_native_prices
+      - name: tokens_stablecoins
   - name: aptos_bronze
     database: aptos
     schema: bronze
