@@ -1,32 +1,13 @@
 {{ config(
     materialized = 'incremental',
     unique_key = ['tx_hash', 'event_index'],
-    incremental_strategy = 'delete+insert',
+    incremental_strategy = 'merge',
     merge_exclude_columns = ["inserted_timestamp"],
     cluster_by = ['block_timestamp::DATE'],
     tags = ['silver', 'defi', 'stablecoins']
 ) }}
 
-WITH bridge_addresses AS (
-    SELECT DISTINCT bridge_address
-    FROM {{ ref('silver__bridge_addresses_seed') }}
-),
-
-bridge_transactions AS (
-    SELECT DISTINCT
-        tx_hash,
-        token_address AS metadata_address
-    FROM {{ ref('silver__bridge_combined') }}
-
-    {% if is_incremental() %}
-    WHERE modified_timestamp >= (
-        SELECT MAX(source_modified_timestamp)
-        FROM {{ this }}
-    )
-    {% endif %}
-),
-
-verified_stablecoins AS (
+WITH verified_stablecoins AS (
     SELECT
         token_address,
         symbol,
@@ -56,14 +37,14 @@ stablecoin_transfers AS (
     FROM {{ ref('core__fact_transfers') }} t
     INNER JOIN verified_stablecoins d
         ON t.token_address = d.token_address
-    LEFT JOIN bridge_addresses ba
-        ON t.account_address = ba.bridge_address
-    LEFT JOIN bridge_transactions bt
-        ON t.tx_hash = bt.tx_hash
-        AND t.token_address = bt.metadata_address
     WHERE t.success = TRUE
-        AND ba.bridge_address IS NULL
-        AND bt.tx_hash IS NULL
+        -- Bridge exclusion
+        AND t.account_address NOT IN (
+            SELECT bridge_address FROM {{ ref('silver__bridge_addresses_seed') }}
+        )
+        AND (t.tx_hash, t.token_address) NOT IN (
+            SELECT tx_hash, token_address FROM {{ ref('silver__bridge_combined') }}
+        )
 
     {% if is_incremental() %}
     AND t.modified_timestamp >= (
