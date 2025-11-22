@@ -1,7 +1,7 @@
 {{ config(
     materialized = 'incremental',
     unique_key = ['block_date','address','token_address'],
-    incremental_strategy = 'incremental',
+    incremental_strategy = 'delete+insert',
     merge_exclude_columns = ["inserted_timestamp"],
     cluster_by = ['block_date','_inserted_timestamp::DATE'],
     post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(address, token_address);",
