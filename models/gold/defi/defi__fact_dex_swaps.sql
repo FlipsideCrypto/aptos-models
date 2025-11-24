@@ -28,7 +28,7 @@ GROUP BY
     ) %}
     {% set min_block_date_query %}
 SELECT
-    MIN(block_timestamp)
+    GREATEST(MIN(block_timestamp),SYSDATE()::DATE - 3) AS min_block_date
 FROM
     {{ ref('silver__dex_swaps_combined') }} A
     LEFT JOIN core.dex_swaps__mod_intermediate_tmp b

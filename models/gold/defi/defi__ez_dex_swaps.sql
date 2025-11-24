@@ -99,21 +99,14 @@ WHERE
     GREATEST(
         A.modified_timestamp,
         COALESCE(
-            t_in.modified_timestamp,
-            '2000-01-01'
-        ),
-        COALESCE(
-            t_out.modified_timestamp,
-            '2000-01-01'
-        ),
-        COALESCE(
             p_in.modified_timestamp,
             '2000-01-01'
         ),
         COALESCE(
             p_out.modified_timestamp,
             '2000-01-01'
-        )
+        ),
+        SYSDATE() :: DATE - 7
     ) >= GREATEST(
         (
             SELECT
@@ -123,6 +116,6 @@ WHERE
             FROM
                 {{ this }}
         ),
-        SYSDATE() :: DATE - 3
+        SYSDATE() :: DATE - 1
     )
 {% endif %}
