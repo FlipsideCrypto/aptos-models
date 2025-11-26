@@ -60,9 +60,9 @@ enriched_stablecoins AS (
         c.token_address,
         c.crosschain_id,
         c.gecko_id,
-        UPPER(COALESCE(c.symbol, m.symbol, p.symbol)) AS symbol,
-        COALESCE(c.name, m.name, p.name) AS name,
-        COALESCE(m.decimals, p.decimals) AS decimals,
+        UPPER(COALESCE(c.symbol, m.symbol, p.symbol, ci.symbol)) AS symbol,
+        COALESCE(c.name, m.name, p.name, ci.name) AS name,
+        COALESCE(m.decimals, p.decimals, ci.decimals) AS decimals,
         m.icon_uri,
         m.project_uri,
         c.peg_type,
@@ -82,6 +82,8 @@ enriched_stablecoins AS (
         ON c.token_address = m.token_address
     LEFT JOIN {{ ref('price__ez_asset_metadata') }} p
         ON c.token_address = p.token_address
+    LEFT JOIN {{ ref('silver__coin_info') }} ci
+        ON c.token_address = ci.coin_type
     LEFT JOIN (
         SELECT
             token_address,
