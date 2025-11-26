@@ -1,0 +1,57 @@
+version: 2
+
+models:
+  - name: silver__balances
+    description: |
+        Daily balance snapshots for ALL Aptos fungible assets (coins and fungible assets).
+
+    tests:
+      - dbt_constraints.primary_key:
+          column_name: BALANCES_ID
+
+    columns:
+      - name: BLOCK_DATE
+        tests:
+          - not_null
+      - name: ADDRESS
+        tests:
+          - not_null
+      - name: TOKEN_ADDRESS
+        tests:
+          - not_null
+      - name: SYMBOL
+        tests:
+          - not_null
+      - name: DECIMALS
+        tests:
+          - not_null
+      - name: NAME
+      - name: POST_BALANCE
+        tests:
+          - not_null
+      - name: BALANCE
+        tests:
+          - not_null
+      - name: FROZEN
+        description: |
+          Account freeze status (FungibleAsset-specific field).
+          - TRUE: Account/store is frozen (cannot transfer)
+          - FALSE: Account is active
+          - For Coin standard balances: Always FALSE (Coin doesn't support freezing)
+      - name: BALANCES_ID
+        tests:
+          - not_null
+      - name: INSERTED_TIMESTAMP
+        tests:
+          - not_null
+      - name: MODIFIED_TIMESTAMP
+        tests:
+          - not_null
+      - name: _INSERTED_TIMESTAMP
+        tests:
+          - name: not_null_silver__balances_INSERTED_TIMESTAMP_
+            test_name: not_null
+      - name: _INVOCATION_ID
+        tests:
+          - name: not_null_silver__balances_INVOCATION_ID
+            test_name: not_null
