@@ -82,7 +82,7 @@ existing_supply AS (
         ON t.address = b.address
         AND t.contract_address = b.contract_address
     WHERE block_date = (SELECT MAX(block_date) FROM {{ this }})
-      AND b.address IS NULLn
+      AND b.address IS NULL
 ),
 {% endif %}
 
