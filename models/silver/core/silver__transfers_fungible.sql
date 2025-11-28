@@ -1,7 +1,7 @@
 {{ config(
   materialized = 'incremental',
   unique_key = ['tx_hash','event_index','block_timestamp::DATE'],
-  incremental_strategy = 'merge',
+  incremental_strategy = 'delete+insert',
   merge_exclude_columns = ["inserted_timestamp"],
   cluster_by = ['block_timestamp::DATE','modified_timestamp::DATE'],
   tags = ['core','full_test']
