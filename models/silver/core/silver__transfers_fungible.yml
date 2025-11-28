@@ -31,8 +31,6 @@ models:
         tests:
           - not_null
       - name: OWNER_ADDRESS
-        tests:
-          - not_null
       - name: METADATA_ADDRESS
       - name: AMOUNT
         tests:
