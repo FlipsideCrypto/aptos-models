@@ -33,13 +33,14 @@ WITH changes_source AS (
 ),
 
 -- Capture temporary fungible store owners from deletion events
+-- Use negative indices to avoid collision with change_index values
 deletion_events_source AS (
   SELECT
     block_timestamp,
     block_number,
     version,
     tx_hash,
-    event_index as change_index,
+    -1 * (event_index + 1) AS change_index,
     event_data :store :: STRING AS store_address,
     event_data :owner :: STRING AS owner_address
   FROM
