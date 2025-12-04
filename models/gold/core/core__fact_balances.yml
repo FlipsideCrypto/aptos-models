@@ -1,0 +1,39 @@
+version: 2
+models:
+  - name: core__fact_balances
+
+    columns:
+      - name: BLOCK_DATE
+
+      - name: ADDRESS
+        description: '{{ doc("address") }}'
+
+      - name: TOKEN_ADDRESS
+        description: '{{ doc("token_address") }}'
+
+      - name: BALANCE_UNADJ
+
+      - name: BALANCE
+
+      - name: SYMBOL
+        description: '{{ doc("symbol") }}'
+
+      - name: NAME
+        description: '{{ doc("name") }}'
+
+      - name: DECIMALS
+        description: '{{ doc("decimals") }}'
+
+      - name: FROZEN
+
+      - name: FACT_BALANCES_ID
+        description: '{{ doc("pk") }}'
+        tests:
+          - unique:
+              where: block_date > current_date - 3
+
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'
+
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}'
