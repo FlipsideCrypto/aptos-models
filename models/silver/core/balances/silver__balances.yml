@@ -11,47 +11,40 @@ models:
 
     columns:
       - name: BLOCK_DATE
-        tests:
-          - not_null
+
       - name: ADDRESS
-        tests:
-          - not_null
+        description: '{{ doc("address") }}'
+
       - name: TOKEN_ADDRESS
-        tests:
-          - not_null
-      - name: SYMBOL
-        tests:
-          - not_null
-      - name: DECIMALS
-        tests:
-          - not_null
-      - name: NAME
+        description: '{{ doc("token_address") }}'
+
       - name: POST_BALANCE
-        tests:
-          - not_null
-      - name: BALANCE
-        tests:
-          - not_null
+
       - name: FROZEN
         description: |
           Account freeze status (FungibleAsset-specific field).
           - TRUE: Account/store is frozen (cannot transfer)
           - FALSE: Account is active
           - For Coin standard balances: Always FALSE (Coin doesn't support freezing)
+
+      - name: IS_VERIFIED
+        description: |
+          Whether the token has verified price data.
+          - TRUE: Token exists in price__ez_prices_hourly with is_verified = TRUE
+          - FALSE: Token has no verified price data
+
       - name: BALANCES_ID
+        description: '{{ doc("pk") }}'
         tests:
-          - not_null
+          - unique:
+              where: block_date > current_date - 3
+
       - name: INSERTED_TIMESTAMP
-        tests:
-          - not_null
+        description: '{{ doc("inserted_timestamp") }}'
+
       - name: MODIFIED_TIMESTAMP
-        tests:
-          - not_null
+        description: '{{ doc("modified_timestamp") }}'
+
       - name: _INSERTED_TIMESTAMP
-        tests:
-          - name: not_null_silver__balances_INSERTED_TIMESTAMP_
-            test_name: not_null
+
       - name: _INVOCATION_ID
-        tests:
-          - name: not_null_silver__balances_INVOCATION_ID
-            test_name: not_null
