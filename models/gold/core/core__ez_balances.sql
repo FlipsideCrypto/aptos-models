@@ -13,7 +13,7 @@ SELECT
     f.symbol,
     f.name,
     f.decimals,
-    COALESCE(p.is_verified, FALSE) AS token_is_verified,
+    f.token_is_verified,
     f.frozen,
     f.fact_balances_id AS ez_balances_id,
     f.inserted_timestamp,

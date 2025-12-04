@@ -178,17 +178,28 @@ filtered_balances AS (
               AND last_positive_date IS NOT NULL
               AND DATEDIFF('day', last_positive_date, block_date) <= 3)
       )
+),
+
+verified_tokens AS (
+    SELECT DISTINCT
+        token_address,
+        is_verified
+    FROM {{ ref('price__ez_prices_hourly') }}
+    WHERE is_verified = TRUE
 )
 
 SELECT
-    block_date,
-    address,
-    token_address,
-    post_balance,
-    frozen,
-    {{ dbt_utils.generate_surrogate_key(['block_date', 'address', 'token_address']) }} AS balances_id,
+    f.block_date,
+    f.address,
+    f.token_address,
+    f.post_balance,
+    f.frozen,
+    COALESCE(v.is_verified, FALSE) AS is_verified,
+    {{ dbt_utils.generate_surrogate_key(['f.block_date', 'f.address', 'f.token_address']) }} AS balances_id,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
-    _inserted_timestamp,
+    f._inserted_timestamp,
     '{{ invocation_id }}' AS _invocation_id
-FROM filtered_balances
+FROM filtered_balances f
+LEFT JOIN verified_tokens v
+    ON LOWER(f.token_address) = LOWER(v.token_address)
