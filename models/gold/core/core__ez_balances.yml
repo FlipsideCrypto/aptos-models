@@ -4,14 +4,26 @@ models:
 
     columns:
       - name: BLOCK_DATE
+        tests:
+          - not_null:
+              where: block_date > current_date - 3
 
       - name: ADDRESS
         description: '{{ doc("address") }}'
+        tests:
+          - not_null:
+              where: block_date > current_date - 3
 
       - name: TOKEN_ADDRESS
         description: '{{ doc("token_address") }}'
+        tests:
+          - not_null:
+              where: block_date > current_date - 3
 
       - name: BALANCE_UNADJ
+        tests:
+          - not_null:
+              where: block_date > current_date - 3
 
       - name: BALANCE
 
@@ -27,13 +39,21 @@ models:
         description: '{{ doc("decimals") }}'
 
       - name: TOKEN_IS_VERIFIED
+        tests:
+          - not_null:
+              where: block_date > current_date - 3
 
       - name: FROZEN
+        tests:
+          - not_null:
+              where: block_date > current_date - 3
 
       - name: EZ_BALANCES_ID
         description: '{{ doc("pk") }}'
         tests:
           - unique:
+              where: block_date > current_date - 3
+          - not_null:
               where: block_date > current_date - 3
 
       - name: INSERTED_TIMESTAMP
