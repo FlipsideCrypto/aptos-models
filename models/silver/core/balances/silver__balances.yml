@@ -3,7 +3,10 @@ version: 2
 models:
   - name: silver__balances
     description: |
-        Daily balance snapshots for ALL Aptos fungible assets (coins and fungible assets).
+        DEPRECATED: This model is superseded by silver__bals + silver__bals_daily.
+        Please use the new two-layer architecture instead.
+
+        Original description: Daily balance snapshots for ALL Aptos fungible assets (coins and fungible assets).
 
     tests:
       - dbt_constraints.primary_key:

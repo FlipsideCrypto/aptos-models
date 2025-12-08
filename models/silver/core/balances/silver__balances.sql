@@ -1,3 +1,12 @@
+{#
+  DEPRECATED: This model is superseded by silver__bals + silver__bals_daily.
+  Please use the new two-layer architecture instead:
+    - silver__bals: Raw balance changes (activity days only)
+    - silver__bals_daily: Daily aggregated balances with forward-fill
+
+  This model is kept for reference but should not be run.
+#}
+
 {{ config(
     materialized = 'incremental',
     unique_key = ['block_date', 'address', 'token_address'],
@@ -5,7 +14,8 @@
     merge_exclude_columns = ["inserted_timestamp"],
     cluster_by = ['block_date', '_inserted_timestamp::DATE'],
     post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(address, token_address);",
-    tags = ['core', 'full_test']
+    tags = ['deprecated'],
+    enabled = false
 ) }}
 
 WITH fungible_asset_balances AS (
