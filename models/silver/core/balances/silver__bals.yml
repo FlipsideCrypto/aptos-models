@@ -1,0 +1,54 @@
+version: 2
+
+models:
+  - name: silver__bals
+    description: |
+      Raw balance changes for verified tokens only. Captures the last balance state
+      per (address, token_address) per day from fungible asset stores.
+
+    columns:
+      - name: BLOCK_NUMBER
+
+      - name: BLOCK_TIMESTAMP
+
+      - name: BLOCK_DATE
+
+      - name: VERSION
+        tests:
+          - not_null:
+              where: block_date > current_date - 3
+
+      - name: ADDRESS
+        description: '{{ doc("address") }}'
+        tests:
+          - not_null:
+              where: block_date > current_date - 3
+
+      - name: TOKEN_ADDRESS
+        description: '{{ doc("token_address") }}'
+        tests:
+          - not_null:
+              where: block_date > current_date - 3
+
+      - name: BALANCE
+        tests:
+          - not_null:
+              where: block_date > current_date - 3
+
+      - name: FROZEN
+
+      - name: BALANCES_ID
+        description: '{{ doc("pk") }}'
+        tests:
+          - unique:
+              where: block_date > current_date - 3
+          - not_null:
+              where: block_date > current_date - 3
+
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'
+
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}'
+
+      - name: _INVOCATION_ID

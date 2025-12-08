@@ -59,6 +59,9 @@ models:
           - not_null:
               where: balance_date > current_date - 3
 
+      - name: TOKEN_IS_VERIFIED
+        description: Boolean indicating whether the token has been verified with a reliable price source.
+
       - name: EZ_BALANCES_DAILY_ID
         description: '{{ doc("pk") }}'
         tests:

@@ -1,0 +1,59 @@
+version: 2
+
+models:
+  - name: silver__bals_daily
+    description: |
+      Daily balance snapshots with forward-filling. Contains one row per (address, token_address)
+      per day for all addresses with positive balances.
+
+    columns:
+      - name: BALANCE_DATE
+        tests:
+          - not_null:
+              where: balance_date > current_date - 3
+
+      - name: ADDRESS
+        description: '{{ doc("address") }}'
+        tests:
+          - not_null:
+              where: balance_date > current_date - 3
+
+      - name: TOKEN_ADDRESS
+        description: '{{ doc("token_address") }}'
+        tests:
+          - not_null:
+              where: balance_date > current_date - 3
+
+      - name: BALANCE
+        tests:
+          - not_null:
+              where: balance_date > current_date - 3
+
+      - name: FROZEN
+
+      - name: LAST_BALANCE_CHANGE
+        description: The date when the balance was last modified for this address-token combination.
+
+      - name: BALANCE_CHANGED_ON_DATE
+        description: |
+          Boolean indicating whether the balance changed on this specific date.
+          TRUE = actual transaction occurred, FALSE = forward-filled from previous day.
+        tests:
+          - not_null:
+              where: balance_date > current_date - 3
+
+      - name: BALANCES_DAILY_ID
+        description: '{{ doc("pk") }}'
+        tests:
+          - unique:
+              where: balance_date > current_date - 3
+          - not_null:
+              where: balance_date > current_date - 3
+
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'
+
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}'
+
+      - name: _INVOCATION_ID
