@@ -7,7 +7,8 @@ WITH end_of_day_prices AS (
     SELECT
         token_address,
         hour::DATE AS price_date,
-        price
+        price,
+        is_verified
     FROM
         {{ ref('price__ez_prices_hourly') }}
     QUALIFY ROW_NUMBER() OVER (
@@ -29,6 +30,7 @@ SELECT
     b.frozen,
     b.last_balance_change,
     b.balance_changed_on_date,
+    p.is_verified AS token_is_verified,
     b.balances_daily_id AS ez_balances_daily_id,
     b.inserted_timestamp,
     b.modified_timestamp
