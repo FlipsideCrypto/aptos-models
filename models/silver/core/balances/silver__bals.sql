@@ -1,6 +1,6 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = [ 'version'],
+    unique_key = ['balances_id'],
     incremental_strategy = 'merge',
     merge_exclude_columns = ["inserted_timestamp"],
     cluster_by = ['modified_timestamp'],
