@@ -15,6 +15,7 @@ models:
               datepart: day
               interval: 7
               group_by_columns: [PLATFORM]
+              where: "PLATFORM != 'echo'"
     columns:
       - name: PLATFORM
         description: "{{ doc('lending_platform') }}"
