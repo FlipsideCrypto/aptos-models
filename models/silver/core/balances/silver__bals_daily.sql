@@ -6,9 +6,10 @@
     merge_exclude_columns = ["inserted_timestamp"],
     post_hook = [
         "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(address, token_address);",
-        "DELETE FROM {{ this }} WHERE balance_date < CURRENT_DATE - 95 AND DAYOFWEEK(balance_date) != 0;"
+        "DELETE FROM {{ this }} WHERE balance_date < CURRENT_DATE - 95 AND DAYOFWEEK(balance_date) != 0;",
+        "{{ unverify_tokens() }}"
     ],
-    tags = ['daily_balances'],
+    tags = ['daily_balances', 'heal'],
     full_refresh = false
 ) }}
 
@@ -49,6 +50,66 @@ latest_balances_from_table AS (
         SELECT MAX(balance_date)
         FROM {{ this }}
     )
+),
+{% endif %}
+
+{% if is_incremental() and var('HEAL_MODEL', false) %}
+newly_verified_tokens AS (
+    {{ get_missing_verified_tokens() }}
+),
+heal_date_spine AS (
+    SELECT date_day AS balance_date
+    FROM {{ source('crosschain', 'dim_dates') }}
+    WHERE date_day >= '2023-07-28'
+        AND date_day < SYSDATE() :: DATE
+),
+heal_source_balances AS (
+    SELECT
+        block_date AS balance_date,
+        address,
+        token_address,
+        balance,
+        frozen,
+        block_timestamp AS last_balance_change_timestamp,
+        TRUE AS balance_changed_on_date
+    FROM {{ ref('silver__bals') }}
+    WHERE LOWER(token_address) IN (SELECT token_address FROM newly_verified_tokens)
+    QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY block_date, address, token_address
+        ORDER BY block_timestamp DESC, block_number DESC, version DESC
+    ) = 1
+),
+heal_address_token_combinations AS (
+    SELECT DISTINCT address, token_address
+    FROM heal_source_balances
+),
+heal_daily_balances AS (
+    SELECT
+        d.balance_date,
+        c.address,
+        c.token_address,
+        LAST_VALUE(t.balance IGNORE NULLS) OVER (
+            PARTITION BY c.address, c.token_address
+            ORDER BY d.balance_date
+            ROWS UNBOUNDED PRECEDING
+        ) AS balance,
+        LAST_VALUE(t.frozen IGNORE NULLS) OVER (
+            PARTITION BY c.address, c.token_address
+            ORDER BY d.balance_date
+            ROWS UNBOUNDED PRECEDING
+        ) AS frozen,
+        LAST_VALUE(t.last_balance_change_timestamp IGNORE NULLS) OVER (
+            PARTITION BY c.address, c.token_address
+            ORDER BY d.balance_date
+            ROWS UNBOUNDED PRECEDING
+        ) AS last_balance_change_timestamp,
+        CASE WHEN t.balance_date IS NOT NULL THEN TRUE ELSE FALSE END AS balance_changed_on_date
+    FROM heal_date_spine d
+    CROSS JOIN heal_address_token_combinations c
+    LEFT JOIN heal_source_balances t
+        ON d.balance_date = t.balance_date
+        AND c.address = t.address
+        AND c.token_address = t.token_address
 ),
 {% endif %}
 
@@ -225,6 +286,31 @@ source_data AS (
     {% endif %}
 )
 
+final_data AS (
+    SELECT
+        balance_date,
+        address,
+        token_address,
+        balance,
+        frozen,
+        last_balance_change_timestamp,
+        balance_changed_on_date
+    FROM source_data
+
+    {% if is_incremental() and var('HEAL_MODEL', false) %}
+    UNION ALL
+    SELECT
+        balance_date,
+        address,
+        token_address,
+        balance,
+        frozen,
+        last_balance_change_timestamp,
+        balance_changed_on_date
+    FROM heal_daily_balances
+    {% endif %}
+)
+
 SELECT
     balance_date,
     address,
@@ -237,6 +323,6 @@ SELECT
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp,
     '{{ invocation_id }}' AS _invocation_id
-FROM source_data
+FROM final_data
 WHERE balance IS NOT NULL  -- Only include addresses that have had at least one balance
     AND balance > 0  -- Only include addresses with positive balances
