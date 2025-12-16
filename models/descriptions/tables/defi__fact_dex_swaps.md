@@ -1,7 +1,7 @@
 {% docs defi__fact_dex_swaps %}
 
 ## Description
-This table records all raw on-chain DEX swap events on Aptos for protocols including animeswap, auxexchange, batswap, cellana, cetus, hippo, liquidswap, pancake, sushi, thala, and tsunami. It provides the unadjusted, protocol-level swap data, including token addresses, amounts, and swapper addresses, without any decimal adjustment, token symbol enrichment, or price attribution.
+This table records all raw on-chain DEX swap events on Aptos for protocols including animeswap, auxexchange, batswap, cellana, cetus, hippo, liquidswap, pancake, sushi, thala, tsunami, hyperion and tapp exchange. It provides the unadjusted, protocol-level swap data, including token addresses, amounts, and swapper addresses, without any decimal adjustment, token symbol enrichment, or price attribution.
 
 ## Key Use Cases
 - Analyzing DEX trading activity and protocol market share
