@@ -1,0 +1,48 @@
+version: 2
+
+models:
+  - name: silver__balances_snapshot
+    description: |
+      Point-in-time snapshot of token balances for verified tokens. Contains one row per 
+      (address, token_address) combination representing the most recent balance state 
+      before the configured SNAPSHOT_DATE variable (default: 2025-09-02).
+
+    columns:
+      - name: BLOCK_NUMBER
+        description: The block number of the transaction that last modified this balance.
+
+      - name: BLOCK_TIMESTAMP
+        description: The timestamp of the block containing the balance change.
+
+      - name: BLOCK_DATE
+        description: The date portion of the block timestamp.
+
+      - name: VERSION
+        description: '{{ doc("version") }}'
+
+      - name: ADDRESS
+        description: '{{ doc("address") }}'
+
+      - name: TOKEN_ADDRESS
+        description: '{{ doc("token_address") }}'
+
+      - name: BALANCE
+        description: The raw token balance amount before decimal adjustment.
+
+      - name: FROZEN
+        description: Boolean indicating whether the fungible asset account is frozen and unable to transfer.
+
+      - name: SNAPSHOT_DATE
+        description: The configured snapshot date used to filter balance records.
+
+      - name: BALANCES_SNAPSHOT_ID
+        description: '{{ doc("pk") }}'
+
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'
+
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}'
+
+      - name: _INVOCATION_ID
+        description: The dbt invocation ID for the run that produced this record.

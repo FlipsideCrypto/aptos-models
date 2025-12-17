@@ -1,0 +1,61 @@
+version: 2
+
+models:
+  - name: silver__balances
+    description: |
+      Raw balance changes for verified tokens only. Captures the last balance state
+      per (address, token_address) per day from fungible asset stores.
+
+    columns:
+      - name: BLOCK_NUMBER
+        description: The block number of the transaction that modified this balance.
+
+      - name: BLOCK_TIMESTAMP
+        description: The timestamp of the block containing the balance change.
+
+      - name: BLOCK_DATE
+        description: The date portion of the block timestamp, used for daily partitioning.
+
+      - name: VERSION
+        description: '{{ doc("version") }}'
+        tests:
+          - not_null:
+              where: block_date > current_date - 3
+
+      - name: ADDRESS
+        description: '{{ doc("address") }}'
+        tests:
+          - not_null:
+              where: block_date > current_date - 3
+
+      - name: TOKEN_ADDRESS
+        description: '{{ doc("token_address") }}'
+        tests:
+          - not_null:
+              where: block_date > current_date - 3
+
+      - name: BALANCE
+        description: The raw token balance amount before decimal adjustment.
+        tests:
+          - not_null:
+              where: block_date > current_date - 3
+
+      - name: FROZEN
+        description: Boolean indicating whether the fungible asset account is frozen and unable to transfer.
+
+      - name: BALANCES_ID
+        description: '{{ doc("pk") }}'
+        tests:
+          - unique:
+              where: block_date > current_date - 3
+          - not_null:
+              where: block_date > current_date - 3
+
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'
+
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}'
+
+      - name: _INVOCATION_ID
+        description: The dbt invocation ID for the run that produced this record.
