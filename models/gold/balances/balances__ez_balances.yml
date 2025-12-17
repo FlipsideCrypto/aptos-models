@@ -1,15 +1,18 @@
 version: 2
 
 models:
-  - name: balances__ez_balances_daily
-    description: '{{ doc("balances__ez_balances_daily") }}'
+  - name: balances__ez_balances
+    description: '{{ doc("balances__ez_balances") }}'
 
     columns:
       - name: BALANCE_DATE
-        description: The date representing the end-of-day balance snapshot.
+        description: The date of the balance record. For snapshot data this is the snapshot date; for recent data this is the block date.
         tests:
           - not_null:
               where: balance_date > current_date - 3
+          - dbt_expectations.expect_row_values_to_have_recent_data:
+              datepart: day
+              interval: 2
 
       - name: ADDRESS
         description: '{{ doc("address") }}'
@@ -51,18 +54,12 @@ models:
               where: balance_date > current_date - 3
 
       - name: LAST_BALANCE_CHANGE
-        description: The date when the balance was last modified for this address-token combination.
-
-      - name: BALANCE_CHANGED_ON_DATE
-        description: Boolean indicating whether the balance changed on this specific date, useful for distinguishing actual changes from forward-filled values.
-        tests:
-          - not_null:
-              where: balance_date > current_date - 3
+        description: The timestamp when the balance was last modified for this address-token combination.
 
       - name: TOKEN_IS_VERIFIED
         description: Boolean indicating whether the token has been verified with a reliable price source.
 
-      - name: EZ_BALANCES_DAILY_ID
+      - name: EZ_BALANCES_ID
         description: '{{ doc("pk") }}'
         tests:
           - unique:
