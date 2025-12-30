@@ -73,6 +73,16 @@ WHERE
 {% do run_query(
   query_tx_batch
 ) %}
+
+{% set tx_batch_dates_query %}
+  SELECT DISTINCT TO_TIMESTAMP(b.value:timestamp::STRING)::DATE AS block_date
+  FROM silver.transactions_tx_batch_intermediate_tmp A,
+  LATERAL FLATTEN(A.data) b
+{% endset %}
+{% set tx_batch_dates_result = run_query(tx_batch_dates_query) %}
+{% set tx_batch_dates = tx_batch_dates_result.columns[0].values() %}
+{% else %}
+{% set tx_batch_dates = [] %}
 {% endif %}
 
 WITH from_blocks AS (
@@ -179,8 +189,17 @@ combo AS (
     A.*
   FROM
     from_transaction_batch A
-    JOIN {{ ref('silver__blocks') }}
-    b
+    JOIN (
+      SELECT *
+      FROM {{ ref('silver__blocks') }}
+      {% if tx_batch_dates %}
+      WHERE block_timestamp::DATE IN (
+        {%- for date in tx_batch_dates -%}
+          '{{ date }}'{% if not loop.last %},{% endif %}
+        {%- endfor -%}
+      )
+      {% endif %}
+    ) b
     ON A.version BETWEEN b.first_version
     AND b.last_version
 )
