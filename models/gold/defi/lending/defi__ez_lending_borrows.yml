@@ -13,7 +13,7 @@ models:
       - recency_where:
               field: BLOCK_TIMESTAMP
               datepart: day
-              interval: 1
+              interval: 2
               group_by_columns: [PLATFORM]
     columns:
       - name: PLATFORM
