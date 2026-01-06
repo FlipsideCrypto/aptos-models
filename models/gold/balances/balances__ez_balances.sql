@@ -37,7 +37,7 @@ recent_balances AS (
     FROM
         {{ ref('silver__balances') }}
     WHERE
-        block_date >= '{{ snapshot_date }}'::DATE
+        block_date > '{{ snapshot_date }}'::DATE
 ),
 
 combined_balances AS (
