@@ -2,13 +2,26 @@
 
 ## Executive Summary
 
-This report identifies **72+ instances** of performance anti-patterns across the dbt project. The most critical issues involve:
+This report identifies **72+ instances** of performance anti-patterns across the dbt project and documents the fixes applied.
 
+### Issues Identified:
 1. **Missing incremental predicates** on 72 of 86 incremental models (84%)
 2. **N+1 query patterns** with 58 `run_query()` calls across 32 files
 3. **Non-sargable JOIN conditions** using `LOWER()` function calls
 4. **Cartesian product** in observability model
 5. **Repeated subquery execution** for `MAX(_inserted_timestamp)`
+
+### Fixes Applied (29 files modified):
+1. ✅ **silver__transactions.sql** - Reduced `run_query()` calls from 4 to 1 (75% reduction)
+2. ✅ **silver__nft_sales_combined.sql** - Cached `MAX(_inserted_timestamp)` as Jinja variable
+3. ✅ **silver_observability__transactions_completeness.sql** - Fixed Cartesian product with explicit `CROSS JOIN`
+4. ✅ **silver__hourly_prices_priority.sql** - Pre-computed `LOWER()` in CTEs for sargable JOINs
+5. ✅ **core__ez_transfers.sql** - Pre-computed `LOWER()` and `DATE_TRUNC()` in CTEs
+6. ✅ **24 silver models** - Added `incremental_predicates` for partition pruning:
+   - 17 DEX swap models
+   - 3 NFT sales models
+   - 2 NFT mint models
+   - 2 bridge transfer models
 
 ---
 
