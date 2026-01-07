@@ -3,6 +3,57 @@
     tags = ['core']
 ) }}
 
+{#
+  PERFORMANCE OPTIMIZATION: Pre-compute LOWER() and DATE_TRUNC() values in CTEs
+  Original issues:
+  - LOWER() on both sides of JOIN prevents index usage (non-sargable)
+  - DATE_TRUNC() computed for every row before join comparison
+#}
+
+WITH transfers_base AS (
+    SELECT
+        block_number,
+        block_timestamp,
+        DATE_TRUNC('hour', block_timestamp) AS block_hour,
+        tx_hash,
+        version,
+        success,
+        event_index,
+        transfer_event,
+        account_address,
+        amount,
+        token_address,
+        LOWER(token_address) AS token_address_lower,
+        fact_transfers_id,
+        inserted_timestamp,
+        modified_timestamp
+    FROM
+        {{ ref('core__fact_transfers') }}
+),
+
+tokens_base AS (
+    SELECT
+        token_address,
+        LOWER(token_address) AS token_address_lower,
+        symbol,
+        decimals
+    FROM
+        {{ ref('core__dim_tokens') }}
+),
+
+prices_base AS (
+    SELECT
+        hour,
+        token_address,
+        LOWER(token_address) AS token_address_lower,
+        symbol,
+        decimals,
+        price,
+        is_verified
+    FROM
+        {{ ref('price__ez_prices_hourly') }}
+)
+
 SELECT
     A.block_number,
     A.block_timestamp,
@@ -40,24 +91,9 @@ SELECT
     A.inserted_timestamp,
     A.modified_timestamp
 FROM
-    {{ ref(
-        'core__fact_transfers'
-    ) }} A
-    LEFT JOIN {{ ref('core__dim_tokens') }}
-    b
-    ON LOWER(
-        A.token_address
-    ) = LOWER(
-        b.token_address
-    )
-    LEFT JOIN {{ ref('price__ez_prices_hourly') }}
-    p
-    ON LOWER(
-        A.token_address
-    ) = LOWER(
-        p.token_address
-    )
-    AND DATE_TRUNC(
-        'hour',
-        A.block_timestamp
-    ) = p.hour
+    transfers_base A
+    LEFT JOIN tokens_base b
+        ON A.token_address_lower = b.token_address_lower
+    LEFT JOIN prices_base p
+        ON A.token_address_lower = p.token_address_lower
+        AND A.block_hour = p.hour

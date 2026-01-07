@@ -5,6 +5,11 @@
     tags = ['observability']
 ) }}
 
+{#
+  PERFORMANCE FIX: Changed implicit Cartesian JOIN (ON 1=1) to explicit CROSS JOIN
+  for clarity and to signal intentional single-row merge
+#}
+
 WITH summary_stats AS (
 
     SELECT
@@ -56,6 +61,7 @@ AND (
 )
 {% endif %}
 ),
+
 base_blocks AS (
     SELECT
         block_number,
@@ -76,6 +82,7 @@ base_blocks AS (
                 summary_stats
         )
 ),
+
 actual_tx_counts AS (
     SELECT
         block_number,
@@ -98,6 +105,7 @@ actual_tx_counts AS (
     GROUP BY
         block_number
 ),
+
 potential_missing_txs AS (
     SELECT
         e.block_number
@@ -111,6 +119,7 @@ potential_missing_txs AS (
             0
         ) <> e.transaction_count
 ),
+
 impacted_blocks AS (
     SELECT
         COUNT(1) AS blocks_impacted_count,
@@ -121,6 +130,7 @@ impacted_blocks AS (
     FROM
         potential_missing_txs
 )
+
 SELECT
     'transactions' AS test_name,
     min_block,
@@ -133,5 +143,4 @@ SELECT
     SYSDATE() AS test_timestamp
 FROM
     summary_stats
-    JOIN impacted_blocks
-    ON 1 = 1
+    CROSS JOIN impacted_blocks

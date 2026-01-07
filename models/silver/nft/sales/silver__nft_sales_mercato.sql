@@ -2,6 +2,7 @@
     materialized = 'incremental',
     unique_key = "nft_sales_mercato_id",
     incremental_strategy = 'merge',
+    incremental_predicates = ["dynamic_range_predicate", "block_timestamp::DATE"],
     cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE'],
     merge_exclude_columns = ["inserted_timestamp"],
     tags = ['noncore']
