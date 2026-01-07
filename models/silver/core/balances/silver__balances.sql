@@ -6,7 +6,7 @@
     cluster_by = ['modified_timestamp'],
     incremental_predicates = ["dynamic_range_predicate", "block_timestamp::DATE"],
     post_hook = '{{ unverify_tokens() }}',
-    tags = ['noncore', 'full_test', 'heal']
+    tags = ['daily', 'full_test', 'heal']
 ) }}
 -- at most one record per (address, token_address) pair per day - we will get the last transaction of the day
 WITH verified_tokens AS (
