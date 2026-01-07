@@ -294,11 +294,34 @@ Several complex views with multiple JOINs and UNIONs are queried by downstream i
 
 ## Files Requiring Immediate Attention
 
-1. `models/silver/core/silver__transactions.sql` - 4 run_query() calls
+1. ~~`models/silver/core/silver__transactions.sql` - 4 run_query() calls~~ **FIXED**
 2. `models/silver/nft/sales/silver__nft_sales_combined.sql` - repeated subqueries, SELECT *
 3. `models/silver/_observability/silver_observability__transactions_completeness.sql` - Cartesian product
 4. `models/silver/price/silver__hourly_prices_priority.sql` - 3 non-sargable JOINs
 5. `models/gold/core/core__ez_transfers.sql` - LOWER() + DATE_TRUNC in JOINs
+
+---
+
+## Applied Fixes
+
+### Fix 1: silver__transactions.sql - Reduced run_query() calls from 4 to 1
+
+**Problem**: 4 sequential `run_query()` calls causing multiple database round-trips during compilation:
+1. Query to get `MAX(_inserted_timestamp)`
+2. Query to create temp table for blocks
+3. Query to create temp table for tx_batch
+4. Query to get distinct dates from temp table
+
+**Solution**:
+- Kept only the first `run_query()` for `max_ins` (required for compile-time filtering)
+- Converted temp tables to CTEs (`blocks_source`, `tx_batch_source`)
+- Replaced Jinja for-loop date generation with SQL subquery (`tx_batch_dates` CTE)
+
+**Benefits**:
+- 75% reduction in compilation-time database round-trips
+- Snowflake CTE optimization can materialize and reuse intermediate results
+- Cleaner, more maintainable code structure
+- No functional change to query results
 
 ---
 
