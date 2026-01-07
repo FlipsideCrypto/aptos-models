@@ -1,0 +1,74 @@
+version: 2
+
+models:
+  - name: balances__ez_balances
+    description: '{{ doc("balances__ez_balances") }}'
+
+    columns:
+      - name: BALANCE_DATE
+        description: The date of the balance record. For snapshot data this is the snapshot date; for recent data this is the block date.
+        tests:
+          - not_null:
+              where: balance_date > current_date - 3
+          - dbt_expectations.expect_row_values_to_have_recent_data:
+              datepart: day
+              interval: 2
+
+      - name: ADDRESS
+        description: '{{ doc("address") }}'
+        tests:
+          - not_null:
+              where: balance_date > current_date - 3
+
+      - name: TOKEN_ADDRESS
+        description: '{{ doc("token_address") }}'
+        tests:
+          - not_null:
+              where: balance_date > current_date - 3
+
+      - name: BALANCE_RAW
+        description: The unadjusted token balance as stored on-chain, before decimal adjustment.
+        tests:
+          - not_null:
+              where: balance_date > current_date - 3
+
+      - name: BALANCE
+        description: The decimal-adjusted token balance, representing human-readable token amounts.
+
+      - name: BALANCE_USD
+        description: The USD value of the balance, calculated using the end-of-day token price.
+
+      - name: SYMBOL
+        description: '{{ doc("symbol") }}'
+
+      - name: TOKEN_NAME
+        description: The full name of the token.
+
+      - name: DECIMALS
+        description: '{{ doc("decimals") }}'
+
+      - name: FROZEN
+        description: Boolean indicating whether the fungible asset account is frozen and unable to transfer.
+        tests:
+          - not_null:
+              where: balance_date > current_date - 3
+
+      - name: LAST_BALANCE_CHANGE
+        description: The timestamp when the balance was last modified for this address-token combination.
+
+      - name: TOKEN_IS_VERIFIED
+        description: Boolean indicating whether the token has been verified with a reliable price source.
+
+      - name: EZ_BALANCES_ID
+        description: '{{ doc("pk") }}'
+        tests:
+          - unique:
+              where: balance_date > current_date - 3
+          - not_null:
+              where: balance_date > current_date - 3
+
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'
+
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}'
