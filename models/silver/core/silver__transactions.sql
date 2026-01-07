@@ -10,82 +10,66 @@
 ) }}
 -- depends_on: {{ ref('bronze__streamline_blocks_tx') }}
 -- depends_on: {{ ref('bronze__streamline_transaction_batch') }}
-{% if execute %}
-  {% set max_inserted_query %}
 
+{#
+  PERFORMANCE OPTIMIZATION: Reduced from 4 run_query() calls to 1
+  - Converted temp tables to CTEs (blocks_source, tx_batch_source)
+  - Replaced Jinja date loop with SQL subquery (tx_batch_dates CTE)
+  Original issue: 4 sequential database round-trips during compilation
+#}
+
+{% if execute and is_incremental() %}
+  {% set max_inserted_query %}
   SELECT
     DATEADD('minute', -5, MAX(_inserted_timestamp))
   FROM
     {{ this }}
+  {% endset %}
+  {% set max_ins = run_query(max_inserted_query)[0][0] %}
+  {% if not max_ins or max_ins == 'None' %}
+    {% set max_ins = '2099-01-01' %}
+  {% endif %}
+{% endif %}
 
-    {% endset %}
-    {% set max_ins = run_query(max_inserted_query) [0] [0] %}
-    {% if not max_ins or max_ins == 'None' %}
-      {% set max_ins = '2099-01-01' %}
-    {% endif %}
-
-    {% set query_blocks %}
-    CREATE
-    OR REPLACE temporary TABLE silver.transactions__block_intermediate_tmp AS
+WITH blocks_source AS (
   SELECT
     DATA,
     partition_key,
     _inserted_timestamp
   FROM
-
 {% if is_incremental() %}
-{{ ref('bronze__streamline_blocks_tx') }}
+    {{ ref('bronze__streamline_blocks_tx') }}
+  WHERE
+    _inserted_timestamp >= '{{ max_ins }}'
 {% else %}
-  {{ ref('bronze__streamline_FR_blocks_tx') }}
+    {{ ref('bronze__streamline_FR_blocks_tx') }}
 {% endif %}
+),
 
+tx_batch_source AS (
+  SELECT
+    DATA,
+    partition_key,
+    _inserted_timestamp
+  FROM
 {% if is_incremental() %}
-WHERE
-  _inserted_timestamp >= '{{max_ins}}'
-{% endif %}
-
-{% endset %}
-{% do run_query(
-  query_blocks
-) %}
-{% set query_tx_batch %}
-CREATE
-OR REPLACE temporary TABLE silver.transactions_tx_batch_intermediate_tmp AS
-SELECT
-  DATA,
-  VALUE,
-  partition_key,
-  _inserted_timestamp
-FROM
-
-{% if is_incremental() %}
-{{ ref('bronze__streamline_transaction_batch') }}
+    {{ ref('bronze__streamline_transaction_batch') }}
+  WHERE
+    _inserted_timestamp >= '{{ max_ins }}'
 {% else %}
-  {{ ref('bronze__streamline_FR_transaction_batch') }}
+    {{ ref('bronze__streamline_FR_transaction_batch') }}
 {% endif %}
+),
 
-{% if is_incremental() %}
-WHERE
-  _inserted_timestamp >= '{{max_ins}}'
-{% endif %}
+tx_batch_dates AS (
+  SELECT DISTINCT
+    TO_TIMESTAMP(b.value:timestamp::STRING)::DATE AS block_date
+  FROM
+    tx_batch_source A,
+    LATERAL FLATTEN(A.data) b
+),
 
-{% endset %}
-{% do run_query(
-  query_tx_batch
-) %}
-
-{% set tx_batch_dates_query %}
-  SELECT DISTINCT TO_TIMESTAMP(b.value:timestamp::STRING)::DATE AS block_date
-  FROM silver.transactions_tx_batch_intermediate_tmp A,
-  LATERAL FLATTEN(A.data) b
-{% endset %}
-{% set tx_batch_dates_result = run_query(tx_batch_dates_query) %}
-{% set tx_batch_dates = tx_batch_dates_result.columns[0].values() %}
-{% else %}
-{% set tx_batch_dates = [] %}
-{% endif %}
-
-WITH from_blocks AS (
+from_blocks AS (
   SELECT
     a.data :block_height :: INT AS block_number,
     TO_TIMESTAMP(
@@ -128,14 +112,14 @@ WITH from_blocks AS (
     _inserted_timestamp,
     '{{ invocation_id }}' AS _invocation_id
   FROM
-    silver.transactions__block_intermediate_tmp A,
+    blocks_source A,
     LATERAL FLATTEN (
       DATA :transactions
     ) b
 ),
+
 from_transaction_batch AS (
   SELECT
-    {# b.block_number, #}
     TO_TIMESTAMP(
       b.value :timestamp :: STRING
     ) AS block_timestamp,
@@ -173,11 +157,12 @@ from_transaction_batch AS (
     A._inserted_timestamp,
     '{{ invocation_id }}' AS _invocation_id
   FROM
-    silver.transactions_tx_batch_intermediate_tmp A,
+    tx_batch_source A,
     LATERAL FLATTEN(
       A.data
     ) b
 ),
+
 combo AS (
   SELECT
     *
@@ -185,27 +170,25 @@ combo AS (
     from_blocks
   UNION ALL
   SELECT
-    b.block_number,
+    blk.block_number,
     A.*
   FROM
     from_transaction_batch A
     JOIN (
-      SELECT *
+      SELECT
+        block_number,
+        first_version,
+        last_version
       FROM {{ ref('silver__blocks') }}
-      {% if tx_batch_dates %}
-      WHERE block_timestamp::DATE IN (
-        {%- for date in tx_batch_dates -%}
-          '{{ date }}'{% if not loop.last %},{% endif %}
-        {%- endfor -%}
-      )
-      {% endif %}
-    ) b
-    ON A.version BETWEEN b.first_version
-    AND b.last_version
+{% if is_incremental() %}
+      WHERE block_timestamp::DATE IN (SELECT block_date FROM tx_batch_dates)
+{% endif %}
+    ) blk
+    ON A.version BETWEEN blk.first_version AND blk.last_version
 )
+
 SELECT
   *
 FROM
-  combo qualify(ROW_NUMBER() over (PARTITION BY tx_hash
-ORDER BY
-  _inserted_timestamp DESC)) = 1
+  combo
+QUALIFY (ROW_NUMBER() OVER (PARTITION BY tx_hash ORDER BY _inserted_timestamp DESC)) = 1

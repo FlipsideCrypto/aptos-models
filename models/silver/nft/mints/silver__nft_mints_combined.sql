@@ -2,6 +2,7 @@
     materialized = 'incremental',
     unique_key = "nft_mints_combined_id",
     incremental_strategy = 'merge',
+    incremental_predicates = ["dynamic_range_predicate", "block_timestamp::DATE"],
     cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE'],
     merge_exclude_columns = ["inserted_timestamp"],
     post_hook = "ALTER TABLE {{ this }} ADD SEARCH OPTIMIZATION ON EQUALITY(tx_hash, version, nft_from_address, nft_to_address, nft_address);",

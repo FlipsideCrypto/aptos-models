@@ -2,6 +2,7 @@
     materialized = 'incremental',
     unique_key = "dex_swaps_cellana_id",
     incremental_strategy = 'merge',
+    incremental_predicates = ["dynamic_range_predicate", "block_timestamp::DATE"],
     merge_exclude_columns = ["inserted_timestamp"],
     cluster_by = ['modified_timestamp::DATE'],
     tags = ['noncore']
